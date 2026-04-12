@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundSpace - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.5); border-radius: 10px; }
+        .chart-container { position: relative; width: 100%; height: 300px; }
+    </style>
+</head>
+<body class="bg-[#09090b] text-zinc-300 font-sans antialiased overflow-hidden flex h-screen">
+
+    <aside class="w-64 bg-[#09090b]/95 border-r border-zinc-800 flex-col hidden lg:flex z-20">
+        <div class="h-20 flex items-center px-6 border-b border-zinc-800">
+            <span class="text-xl font-black text-white uppercase italic">Ayu<span class="text-violet-500">Studio</span></span>
+        </div>
+        <nav class="flex-1 px-4 py-8 space-y-3">
+            <a href="#" class="flex items-center gap-3 bg-violet-600/10 text-violet-400 px-4 py-3 rounded-2xl font-bold text-sm border border-violet-500/20">🎛️ Dashboard</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="h-20 bg-zinc-900/50 border-b border-zinc-800 flex items-center justify-between px-5 md:px-10 z-10 shrink-0">
+            <div>
+                <h1 class="text-white text-xl md:text-2xl font-black italic uppercase">Live Control</h1>
+                <p class="text-violet-400 text-[10px] font-black uppercase mt-1">Admin Panel Real-time</p>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-5 md:p-10 custom-scroll z-10 w-full">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 w-full">
+                <!-- Pendapatan Card -->
+                <div class="bg-zinc-900/80 p-6 rounded-3xl border border-zinc-800 shadow-xl">
+                    <p class="text-zinc-500 text-[10px] font-black uppercase mb-1">Total Pendapatan (Semua Waktu)</p>
+                    <h2 class="text-white text-3xl font-black italic" id="kpi-revenue">Rp 0</h2>
+                </div>
+                <!-- Sesi Card -->
+                <div class="bg-zinc-900/80 p-6 rounded-3xl border border-zinc-800 shadow-xl">
+                    <p class="text-zinc-500 text-[10px] font-black uppercase mb-1" id="label-sesi-lunas">Total Sesi Lunas</p>
+                    <h2 class="text-white text-3xl font-black italic" id="kpi-bookings">0 Sesi</h2>
+                </div>
+                <!-- Pending Card -->
+                <div class="bg-zinc-900/80 p-6 rounded-3xl border border-rose-500/30">
+                    <p class="text-rose-400 text-[10px] font-black uppercase mb-1 animate-pulse">Menunggu Validasi WA</p>
+                    <h2 class="text-white text-3xl font-black italic" id="kpi-pending">0 Antrean</h2>
+                </div>
+            </div>
+
+            <div class="grid xl:grid-cols-3 gap-6 mb-10 w-full">
+                <div class="xl:col-span-2 bg-zinc-900/80 p-6 rounded-[2.5rem] border border-zinc-800 w-full">
+                    <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-2 mb-6">Grafik Omset Harian (Mock Data)</h3>
+                    <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                </div>
+
+                <div class="xl:col-span-1 bg-zinc-900/80 p-6 rounded-[2.5rem] border border-zinc-800 flex flex-col h-[500px] w-full">
+                    <div class="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
+                        <h3 class="text-white font-black uppercase text-sm flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse mt-1"></span> Pending Checkout</h3>
+                    </div>
+                    <div class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-3" id="pending-list">
+                        <!-- Disuntik Firebase -->
+                        <p class="text-center text-zinc-500 text-xs">Memuat antrean...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 p-6 rounded-[2.5rem] border border-zinc-800 w-full mb-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-zinc-800 pb-4 gap-4">
+                    <h3 class="text-white font-black uppercase text-sm">Kontrol Master Jadwal</h3>
+                    
+                    <!-- ADMIN DATE PICKER -->
+                    <div class="flex items-center gap-3">
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pilih Tanggal:</label>
+                        <input type="date" id="admin-date-picker" class="bg-zinc-950 border border-zinc-700 text-white text-xs px-3 py-2 rounded-lg font-bold outline-none focus:border-violet-500 transition-colors" />
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3" id="schedule-grid">
+                    <!-- Disuntik Firebase -->
+                    <p class="text-center text-zinc-500 text-xs col-span-full py-10">Pilih tanggal untuk memuat jadwal.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        // =======================================================
+        // PASTE FIREBASE CONFIG KAMU DI BAWAH INI:
+        // =======================================================
+        const firebaseConfig = {
+        apiKey: "AIzaSyDeY8c5o2m1j9oBbZtxsoZPOe_C2VkDIsk",
+        authDomain: "ayustudio-booking.firebaseapp.com",
+        projectId: "ayustudio-booking",
+        storageBucket: "ayustudio-booking.firebasestorage.app",
+        messagingSenderId: "374878980424",
+        appId: "1:374878980424:web:757591a982f2c32d160b7d",
+        measurementId: "G-W6834JLVHE"
+        };
+        // =======================================================
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+        // Date Picker Logic
+        const datePicker = document.getElementById('admin-date-picker');
+        
+        // Get local timezone date string
+        const d = new Date();
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 10);
+        
+        datePicker.value = localISOTime;
+        let activeDate = localISOTime;
+        let unsubscribeSlots = null;
+
+        const scheduleGrid = document.getElementById('schedule-grid');
+        const kpiBookings = document.getElementById('kpi-bookings');
+        const labelSesiLunas = document.getElementById('label-sesi-lunas');
+
+// --- 1. RENDER JADUAL DARI FIREBASE BERDASARKAN TANGGAL ---
+// --- 1. RENDER JADUAL DARI FIREBASE BERDASARKAN TANGGAL ---
+        const loadSlotsForDate = (dateString) => {
+            if(unsubscribeSlots) unsubscribeSlots(); 
+            
+            labelSesiLunas.innerText = `Total Sesi Lunas (${dateString})`;
+            scheduleGrid.innerHTML = `<p class="text-center text-zinc-500 text-xs col-span-full py-10 animate-pulse">Memuat jadwal ${dateString}...</p>`;
+            
+            const q = query(collection(db, "slots_by_date", dateString, "items"), orderBy("id", "asc"));
+            unsubscribeSlots = onSnapshot(q, (snapshot) => {
+                scheduleGrid.innerHTML = '';
+                let totalSesiHarian = 0; 
+                
+                // JIKA DATA KOSONG ATAU KURANG DARI 13 JAM, MUNCULKAN TOMBOL MAGIC
+                if (snapshot.size < 13) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = "col-span-full mb-2";
+                    alertDiv.innerHTML = `
+                        <button onclick="seedAdminDatabase('${dateString}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(225,29,72,0.4)] animate-pulse">
+                            ⚠️ Jadwal Kurang Lengkap! Klik Untuk Aktifkan Semua Jam di Tgl ${dateString} 🚀
+                        </button>
+                    `;
+                    scheduleGrid.appendChild(alertDiv);
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const slot = docSnap.data();
+                    const btn = document.createElement('button');
+                    
+                    let colorClass = "bg-zinc-950 border-zinc-800 text-zinc-400"; 
+                    if (slot.status === 'booked') { colorClass = "bg-rose-900/20 border-rose-500 text-rose-500"; totalSesiHarian++; }
+                    else if (slot.status === 'pending') { colorClass = "bg-amber-900/20 border-amber-500 text-amber-500 animate-pulse"; }
+                    else if (slot.status === 'blocked') { colorClass = "bg-zinc-900 border-zinc-700 text-zinc-600"; }
+                    
+                    btn.className = `p-4 rounded-xl border-2 font-bold text-sm transition-all touch-manipulation ${colorClass}`;
+                    btn.innerText = slot.time.split(' - ')[0];
+                    
+                    // Logika Klik Admin (Toggle Blokir Manual)
+                    btn.onclick = async () => {
+                        if (slot.status === 'pending') return alert("Slot sedang diproses pelanggan.");
+                        let newStatus = 'available';
+                        if (slot.status === 'available') newStatus = 'blocked';
+                        if (slot.status === 'blocked') newStatus = 'available';
+                        if (slot.status === 'booked') {
+                            if(!confirm("Slot ini sudah LUNAS. Yakin ingin mengosongkan jadwal ini?")) return;
+                        }
+                        await updateDoc(doc(db, "slots_by_date", dateString, "items", docSnap.id), { status: newStatus });
+                    };
+                    scheduleGrid.appendChild(btn);
+                });
+                kpiBookings.innerText = `${totalSesiHarian} Sesi`;
+            });
+        };
+
+        // --- FUNGSI MAGIC UNTUK GENERATE JADWAL DARI ADMIN ---
+        window.seedAdminDatabase = async (targetDate) => {
+            const slotsData = [
+                { id: 1, time: "10:00 - 11:00", status: "available" },
+                { id: 2, time: "11:00 - 12:00", status: "available" },
+                { id: 3, time: "12:00 - 13:00", status: "available" },
+                { id: 4, time: "13:00 - 14:00", status: "available" },
+                { id: 5, time: "14:00 - 15:00", status: "available" },
+                { id: 6, time: "15:00 - 16:00", status: "available" },
+                { id: 7, time: "16:00 - 17:00", status: "available" },
+                { id: 8, time: "17:00 - 18:00", status: "available" },
+                { id: 9, time: "18:00 - 19:00", status: "available" },
+                { id: 10, time: "19:00 - 20:00", status: "available" },
+                { id: 11, time: "20:00 - 21:00", status: "available" },
+                { id: 12, time: "21:00 - 22:00", status: "available" },
+                { id: 13, time: "22:00 - 23:00", status: "available" }
+            ];
+            try {
+                for (const slot of slotsData) {
+                    await setDoc(doc(db, "slots_by_date", targetDate, "items", String(slot.id)), slot);
+                }
+                alert(`Jadwal untuk tanggal ${targetDate} berhasil diaktifkan!`);
+            } catch (e) {
+                console.error(e);
+                alert("Gagal mengaktifkan jadwal. Cek console untuk detail.");
+            }
+        };
+        
+        // FUNGSI UNTUK GENERATE JADWAL DARI ADMIN
+        window.seedAdminDatabase = async (targetDate) => {
+            const slotsData = [
+                { id: 1, time: "10:00 - 11:00", status: "available" },
+                { id: 2, time: "11:00 - 12:00", status: "available" },
+                { id: 3, time: "12:00 - 13:00", status: "available" },
+                { id: 4, time: "13:00 - 14:00", status: "available" },
+                { id: 5, time: "14:00 - 15:00", status: "available" },
+                { id: 6, time: "15:00 - 16:00", status: "available" },
+                { id: 7, time: "16:00 - 17:00", status: "available" },
+                { id: 8, time: "17:00 - 18:00", status: "available" },
+                { id: 9, time: "18:00 - 19:00", status: "available" },
+                { id: 10, time: "19:00 - 20:00", status: "available" },
+                { id: 11, time: "20:00 - 21:00", status: "available" },
+                { id: 12, time: "21:00 - 22:00", status: "available" },
+                { id: 13, time: "22:00 - 23:00", status: "available" }
+            ];
+            try {
+                for (const slot of slotsData) {
+                    await setDoc(doc(db, "slots_by_date", targetDate, "items", String(slot.id)), slot);
+                }
+                alert(`Jadwal untuk tanggal ${targetDate} berhasil diaktifkan!`);
+            } catch (e) {
+                console.error(e);
+                alert("Gagal mengaktifkan jadwal.");
+            }
+        };
+
+        // Listen to Date Change
+        datePicker.addEventListener('change', (e) => {
+            activeDate = e.target.value;
+            loadSlotsForDate(activeDate);
+        });
+
+        // Initial Load
+        loadSlotsForDate(activeDate);
+
+
+        // --- 2. RENDER PENDING BOOKING (WA) ---
+        let totalRev = 0;
+        const pendingList = document.getElementById('pending-list');
+        
+        onSnapshot(query(collection(db, "bookings"), orderBy("createdAt", "asc")), (snapshot) => {
+            pendingList.innerHTML = '';
+            let pendingCount = 0;
+            totalRev = 0; 
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                
+                if (data.status === 'pending') {
+                    pendingCount++;
+                    const item = document.createElement('div');
+                    item.className = "bg-zinc-950 p-4 rounded-2xl border border-zinc-800 shadow-md";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-white font-black text-xs uppercase">${data.service}</div>
+                            <div class="text-emerald-400 font-black text-xs italic">${formatRp(data.price)}</div>
+                        </div>
+                        <div class="text-zinc-400 text-[10px] font-bold tracking-widest mb-1">Tgl: <span class="text-white">${data.date}</span></div>
+                        <div class="text-zinc-400 text-[10px] font-bold tracking-widest mb-3">Jam: <span class="text-white">${data.time}</span></div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-emerald-600 text-white text-[10px] py-2.5 rounded-lg font-black tracking-widest" onclick="approveBooking('${docSnap.id}', '${data.date}', '${data.time}')">TERIMA</button>
+                            <button class="bg-transparent border border-zinc-700 text-rose-500 text-[10px] px-4 py-2.5 rounded-lg font-black" onclick="rejectBooking('${docSnap.id}', '${data.date}', '${data.time}')">TOLAK</button>
+                        </div>
+                    `;
+                    pendingList.appendChild(item);
+                } else if (data.status === 'approved') {
+                    totalRev += data.price; // Tambahkan ke omset keseluruhan
+                }
+            });
+
+            if (pendingCount === 0) {
+                pendingList.innerHTML = `<div class="text-center text-zinc-600 text-xs py-10 font-bold uppercase">Semua Clear!</div>`;
+            }
+            
+            document.getElementById('kpi-pending').innerText = `${pendingCount} Antrean`;
+            document.getElementById('kpi-revenue').innerText = formatRp(totalRev);
+        });
+
+        // --- FUNGSI TERIMA & TOLAK (GLOBAL) ---
+        window.approveBooking = async (id, targetDate, times) => {
+            if(!confirm(`Setujui pembayaran ini untuk tanggal ${targetDate}?`)) return;
+            
+            await updateDoc(doc(db, "bookings", id), { status: "approved" });
+            
+            const timeArray = times.split(', ');
+            const slotsSnap = await getDocs(collection(db, "slots_by_date", targetDate, "items"));
+            
+            slotsSnap.forEach(async (slotDoc) => {
+                const slotData = slotDoc.data();
+                if (timeArray.includes(slotData.time) && slotData.status === 'pending') {
+                    await updateDoc(doc(db, "slots_by_date", targetDate, "items", slotDoc.id), { status: 'booked' });
+                }
+            });
+            alert("Berhasil! Jadwal telah dikunci permanen (Lunas).");
+        };
+
+        window.rejectBooking = async (id, targetDate, times) => {
+            if(!confirm(`Yakin tolak booking ini? Jadwal tanggal ${targetDate} akan kembali kosong.`)) return;
+            
+            await deleteDoc(doc(db, "bookings", id));
+            
+            const timeArray = times.split(', ');
+            const slotsSnap = await getDocs(collection(db, "slots_by_date", targetDate, "items"));
+            
+            slotsSnap.forEach(async (slotDoc) => {
+                const slotData = slotDoc.data();
+                if (timeArray.includes(slotData.time) && slotData.status === 'pending') {
+                    await updateDoc(doc(db, "slots_by_date", targetDate, "items", slotDoc.id), { status: 'available' });
+                }
+            });
+        };
+
+        // --- 3. RENDER MOCK CHART ---
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        Chart.defaults.color = '#a1a1aa';
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Hari Ini'],
+                datasets: [{
+                    label: 'Omset Harian',
+                    data: [150000, 300000, 250000, 450000, 600000, 950000, 0], 
+                    borderColor: '#7c3aed', backgroundColor: 'rgba(124, 58, 237, 0.1)', borderWidth: 3, fill: true, tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>
