@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayu Studio - Admin Dashboard</title>
+    <title>Panel Music - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.5); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.5); border-radius: 10px; }
         .chart-container { position: relative; width: 100%; height: 250px; }
         @media (min-width: 768px) { .chart-container { height: 350px; } }
         .tab-content { display: none; animation: fadeIn 0.4s ease-out forwards; }
@@ -17,26 +17,26 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-[#09090b] text-zinc-300 font-sans antialiased overflow-hidden flex h-screen relative w-full max-w-[100vw]">
+<body class="bg-[#111113] text-zinc-300 font-sans antialiased overflow-hidden flex h-screen relative w-full max-w-[100vw]">
 
     <!-- ========================================== -->
     <!-- 🔐 LAYAR LOGIN OVERLAY -->
     <!-- ========================================== -->
-    <div id="login-overlay" class="fixed inset-0 z-[9999] bg-[#09090b] flex items-center justify-center transition-opacity duration-500 px-4">
-        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-violet-600/20 blur-[100px] rounded-full pointer-events-none"></div>
+    <div id="login-overlay" class="fixed inset-0 z-[9999] bg-[#111113] flex items-center justify-center transition-opacity duration-500 px-4">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-emerald-600/20 blur-[100px] rounded-full pointer-events-none"></div>
         <div class="bg-zinc-900/80 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-zinc-800 shadow-2xl w-full max-w-sm relative z-10 text-center">
-            <div class="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-600/30 mx-auto mb-6">
+            <div class="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-600/30 mx-auto mb-6">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
-            <h2 class="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">AyuStudio<span class="text-violet-500">Admin</span></h2>
+            <h2 class="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Area<span class="text-emerald-500">Admin</span></h2>
             <p class="text-zinc-400 text-sm mb-8">Masukkan PIN rahasia untuk mengakses sistem.</p>
             
-            <input type="password" id="admin-pin" placeholder="••••••" class="w-full bg-zinc-950 border border-zinc-800 text-center text-white text-2xl font-black px-4 py-4 rounded-xl mb-4 outline-none focus:border-violet-500 transition-colors tracking-widest" onkeypress="if(event.key === 'Enter') handleLogin()" />
+            <input type="password" id="admin-pin" placeholder="••••••" class="w-full bg-zinc-950 border border-zinc-800 text-center text-white text-2xl font-black px-4 py-4 rounded-xl mb-4 outline-none focus:border-emerald-500 transition-colors tracking-widest" onkeypress="if(event.key === 'Enter') handleLogin()" />
             
             <p id="login-error" class="text-rose-500 text-xs font-bold uppercase tracking-widest mb-4 hidden">❌ PIN Salah! Coba lagi.</p>
             
-            <button onclick="handleLogin()" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-black uppercase tracking-widest text-sm py-4 rounded-xl transition-all shadow-lg shadow-violet-900/50 active:scale-95">
-                Buka Sistem
+            <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-sm py-4 rounded-xl transition-all shadow-lg shadow-emerald-900/50 active:scale-95">
+                Buka Brankas
             </button>
         </div>
     </div>
@@ -44,22 +44,25 @@
     <!-- ========================================== -->
     <!-- SIDEBAR MENU (DESKTOP) -->
     <!-- ========================================== -->
-    <aside class="w-64 bg-[#09090b]/95 border-r border-zinc-800 flex-col hidden lg:flex z-20 shrink-0">
+    <aside class="w-64 bg-[#111113]/95 border-r border-zinc-800 flex-col hidden lg:flex z-20 shrink-0">
         <div class="h-20 flex items-center px-6 border-b border-zinc-800">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet-500 mr-2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            <span class="text-xl font-black text-white uppercase italic">Ayu<span class="text-violet-500">Studio</span></span>
+            <span class="text-xl font-black text-white tracking-tighter">Panel<span class="text-emerald-500">Music.</span></span>
         </div>
         <nav class="flex-1 px-4 py-8 space-y-3">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 bg-violet-600/10 text-violet-400 px-4 py-3 rounded-2xl font-bold text-sm border border-violet-500/20 transition-all">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 bg-emerald-600/10 text-emerald-400 px-4 py-3 rounded-2xl font-bold text-sm border border-emerald-500/20 transition-all">
                 🎛️ Dashboard Live
             </button>
             <button onclick="switchTab('history')" id="nav-history" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
                 📚 Riwayat Transaksi
             </button>
+            <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
+                🎸 Data Inventaris
+            </button>
         </nav>
+        
         <div class="p-4 border-t border-zinc-800">
             <button onclick="handleLogout()" class="w-full bg-rose-600/10 hover:bg-rose-600 hover:text-white text-rose-500 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Keluar
+                Keluar (Logout)
             </button>
         </div>
     </aside>
@@ -68,19 +71,20 @@
     <!-- MOBILE SIDEBAR OVERLAY (HAMBURGER MENU) -->
     <!-- ========================================== -->
     <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] hidden opacity-0 transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
-    <aside id="mobile-sidebar" class="fixed top-0 left-0 w-64 h-full bg-[#09090b] border-r border-zinc-800 z-[90] transform -translate-x-full transition-transform duration-300 flex flex-col lg:hidden shadow-2xl">
+    <aside id="mobile-sidebar" class="fixed top-0 left-0 w-64 h-full bg-[#111113] border-r border-zinc-800 z-[90] transform -translate-x-full transition-transform duration-300 flex flex-col lg:hidden shadow-2xl">
         <div class="h-20 flex justify-between items-center px-6 border-b border-zinc-800">
-            <span class="text-xl font-black text-white uppercase italic">Ayu<span class="text-violet-500">Studio</span></span>
-            <button onclick="toggleMobileMenu()" class="text-zinc-400 hover:text-white p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
+            <span class="text-xl font-black text-white tracking-tighter">Panel<span class="text-emerald-500">Music.</span></span>
+            <button onclick="toggleMobileMenu()" class="text-zinc-400 hover:text-white p-2">✕</button>
         </div>
         <nav class="flex-1 px-4 py-8 space-y-3">
-            <button onclick="switchTab('dashboard'); toggleMobileMenu()" id="mob-nav-dashboard" class="w-full flex items-center gap-3 bg-violet-600/10 text-violet-400 px-4 py-3 rounded-2xl font-bold text-sm border border-violet-500/20 transition-all">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" id="mob-nav-dashboard" class="w-full flex items-center gap-3 bg-emerald-600/10 text-emerald-400 px-4 py-3 rounded-2xl font-bold text-sm border border-emerald-500/20 transition-all">
                 🎛️ Dashboard Live
             </button>
             <button onclick="switchTab('history'); toggleMobileMenu()" id="mob-nav-history" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
                 📚 Riwayat Transaksi
+            </button>
+            <button onclick="switchTab('inventory'); toggleMobileMenu()" id="mob-nav-inventory" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
+                🎸 Data Inventaris
             </button>
         </nav>
         <div class="p-4 border-t border-zinc-800">
@@ -91,37 +95,34 @@
     </aside>
 
     <!-- ========================================== -->
-    <!-- KONTEN UTAMA -->
+    <!-- KONTEN UTAMA (RESPONSIF) -->
     <!-- ========================================== -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full min-w-0">
         <header class="h-16 md:h-20 bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 flex items-center px-4 md:px-10 z-10 shrink-0 gap-4">
-            <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-white bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-            </button>
+            <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-white bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center">☰</button>
             
             <div class="flex-1 overflow-hidden">
                 <h1 class="text-white text-lg md:text-2xl font-black italic uppercase truncate" id="header-title">Live Control</h1>
-                <p class="text-violet-400 text-[9px] md:text-[10px] font-black uppercase mt-0.5 truncate" id="header-subtitle">Admin Panel Real-time</p>
+                <p class="text-emerald-400 text-[9px] md:text-[10px] font-black uppercase mt-0.5 truncate" id="header-subtitle">Admin Panel Real-time</p>
             </div>
-            
             <button onclick="handleLogout()" class="hidden sm:block lg:hidden bg-rose-600/20 hover:bg-rose-600 hover:text-white text-rose-500 px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest transition-colors shrink-0">Logout</button>
         </header>
 
         <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 custom-scroll z-10 w-full min-w-0 overflow-x-hidden">
             
-            <!-- TAB 1: DASHBOARD -->
+            <!-- TAB 1: DASHBOARD UTAMA -->
             <div id="tab-dashboard" class="tab-content active w-full min-w-0">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8 w-full">
                     <div class="bg-zinc-900/80 p-5 rounded-2xl md:rounded-3xl border border-zinc-800 shadow-xl overflow-hidden">
-                        <p class="text-zinc-500 text-[9px] md:text-[10px] font-black uppercase mb-1 truncate">Pendapatan Total</p>
+                        <p class="text-zinc-500 text-[9px] md:text-[10px] font-black uppercase mb-1 truncate">Pendapatan Total (Lunas)</p>
                         <h2 class="text-white text-2xl md:text-3xl font-black italic truncate" id="kpi-revenue">Rp 0</h2>
                     </div>
                     <div class="bg-zinc-900/80 p-5 rounded-2xl md:rounded-3xl border border-zinc-800 shadow-xl overflow-hidden">
                         <p class="text-zinc-500 text-[9px] md:text-[10px] font-black uppercase mb-1 truncate" id="label-sesi-lunas">Sesi Lunas</p>
                         <h2 class="text-white text-2xl md:text-3xl font-black italic truncate" id="kpi-bookings">0 Sesi</h2>
                     </div>
-                    <div class="bg-zinc-900/80 p-5 rounded-2xl md:rounded-3xl border border-rose-500/30 shadow-[0_0_15px_rgba(225,29,72,0.1)] overflow-hidden">
-                        <p class="text-rose-400 text-[9px] md:text-[10px] font-black uppercase mb-1 animate-pulse truncate">Menunggu Validasi</p>
+                    <div class="bg-zinc-900/80 p-5 rounded-2xl md:rounded-3xl border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)] overflow-hidden">
+                        <p class="text-amber-400 text-[9px] md:text-[10px] font-black uppercase mb-1 animate-pulse truncate">Belum Lunas (Bayar di Kasir)</p>
                         <h2 class="text-white text-2xl md:text-3xl font-black italic truncate" id="kpi-pending">0 Antrean</h2>
                     </div>
                 </div>
@@ -129,14 +130,13 @@
                 <div class="grid xl:grid-cols-3 gap-6 mb-10 w-full min-w-0">
                     <div class="xl:col-span-2 bg-zinc-900/80 p-4 md:p-6 rounded-[2rem] border border-zinc-800 w-full min-w-0 overflow-hidden">
                         <h3 class="text-white font-black uppercase text-xs md:text-sm border-b border-zinc-800 pb-3 mb-4">Grafik Omset Harian</h3>
-                        <!-- Container Grafik Live -->
                         <div class="chart-container w-full"><canvas id="revenueChart"></canvas></div>
                     </div>
 
                     <div class="xl:col-span-1 bg-zinc-900/80 p-4 md:p-6 rounded-[2rem] border border-zinc-800 flex flex-col h-[400px] md:h-auto w-full min-w-0 overflow-hidden">
                         <div class="flex justify-between items-center mb-4 border-b border-zinc-800 pb-3 shrink-0">
                             <h3 class="text-white font-black uppercase text-xs md:text-sm flex gap-2 items-center truncate">
-                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span> Pending Checkout
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span> Menunggu Pembayaran
                             </h3>
                         </div>
                         <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-3" id="pending-list">
@@ -162,36 +162,103 @@
                 </div>
             </div>
 
-            <!-- TAB 2: RIWAYAT TRANSAKSI -->
+            <!-- TAB 2: RIWAYAT TRANSAKSI & EXPORT EXCEL -->
             <div id="tab-history" class="tab-content w-full min-w-0">
                 <div class="bg-zinc-900/80 p-4 md:p-6 rounded-[2rem] border border-zinc-800 w-full min-h-[500px] flex flex-col shadow-xl overflow-hidden">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-zinc-800 pb-4 gap-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-zinc-800 pb-4 gap-4 w-full">
                         <div>
                             <h3 class="text-white font-black uppercase text-sm md:text-base">Daftar Transaksi Lunas</h3>
-                            <p class="text-zinc-500 text-[10px] uppercase font-bold mt-1 tracking-widest">Semua riwayat booking yang disetujui</p>
+                            <p class="text-zinc-500 text-[10px] uppercase font-bold mt-1 tracking-widest">Semua riwayat booking yang disetujui kasir</p>
                         </div>
-                        <span class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                            Verified
-                        </span>
+                        
+                        <!-- TOMBOL EXPORT EXCEL SAKTI -->
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0 shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] transition-all active:scale-95">
+                            ⬇️ Download Laporan (.CSV)
+                        </button>
                     </div>
                     
                     <div class="w-full overflow-x-auto custom-scroll pb-2 rounded-xl">
-                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[800px]">
+                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[1000px]">
                             <thead>
                                 <tr class="bg-zinc-950/80 border-b border-zinc-800 text-zinc-500 text-[10px] uppercase tracking-widest">
                                     <th class="py-4 px-4 font-black rounded-tl-lg">ID / Waktu Order</th>
-                                    <th class="py-4 px-4 font-black">Pelanggan</th>
-                                    <th class="py-4 px-4 font-black">Layanan</th>
+                                    <th class="py-4 px-4 font-black">Pelanggan (Band)</th>
+                                    <th class="py-4 px-4 font-black">Layanan & Addon</th>
                                     <th class="py-4 px-4 font-black">Tgl / Jam Main</th>
-                                    <th class="py-4 px-4 font-black text-right rounded-tr-lg">Total Bayar</th>
+                                    <th class="py-4 px-4 font-black">Detail Input</th>
+                                    <th class="py-4 px-4 font-black text-right rounded-tr-lg">Bayar Cash</th>
                                 </tr>
                             </thead>
                             <tbody id="history-table-body" class="text-sm text-zinc-300 divide-y divide-zinc-800/50">
-                                <tr><td colspan="5" class="text-center py-10 text-zinc-600 font-bold">Memuat riwayat transaksi...</td></tr>
+                                <tr><td colspan="6" class="text-center py-10 text-zinc-600 font-bold">Memuat riwayat transaksi...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DATA INVENTARIS STUDIO -->
+            <div id="tab-inventory" class="tab-content w-full min-w-0">
+                <div class="grid xl:grid-cols-3 gap-6 w-full min-w-0">
+                    
+                    <!-- Kiri: Form Tambah Alat -->
+                    <div class="xl:col-span-1 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full h-fit">
+                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Tambah Inventaris</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kategori / Studio</label>
+                                <select id="inv-kategori" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                    <option value="Studio 1">Studio 1</option>
+                                    <option value="Studio 2">Studio 2</option>
+                                    <option value="Studio 3">Studio 3</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Nama Alat</label>
+                                <input type="text" id="inv-nama" placeholder="Contoh: Drum Snare 14" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Merk / SN</label>
+                                    <input type="text" id="inv-merk" placeholder="Sonor / SN123" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kondisi</label>
+                                    <input type="text" id="inv-kondisi" placeholder="Oke / Rusak" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Tgl Beli & Harga</label>
+                                <input type="text" id="inv-harga" placeholder="Jan 2025 - Rp 1.5jt" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            </div>
+                            <button onclick="addInventory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 mt-2">
+                                Simpan Data Alat
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Tabel Inventaris -->
+                    <div class="xl:col-span-2 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full min-h-[400px] flex flex-col">
+                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Daftar Perlengkapan Studio</h3>
+                        <div class="w-full overflow-x-auto custom-scroll flex-1">
+                            <table class="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
+                                <thead>
+                                    <tr class="bg-zinc-950 text-zinc-500 text-[9px] uppercase tracking-widest">
+                                        <th class="py-3 px-3 font-black rounded-tl-lg">Lokasi</th>
+                                        <th class="py-3 px-3 font-black">Nama Alat & Merk</th>
+                                        <th class="py-3 px-3 font-black">Kondisi</th>
+                                        <th class="py-3 px-3 font-black">Tgl Beli / Harga</th>
+                                        <th class="py-3 px-3 font-black text-right rounded-tr-lg">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-list" class="text-xs text-zinc-300 divide-y divide-zinc-800/50">
+                                    <tr><td colspan="5" class="text-center py-10 text-zinc-600">Memuat data inventaris...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -203,31 +270,24 @@
     <!-- ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        // MENGGUNAKAN initializeFirestore DENGAN LONG POLLING ANTI-BLOKIR
         import { initializeFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, query, orderBy, getDocs, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         
-        // --- CONFIG FIREBASE AYUSTUDIO ---
+        // --- CONFIG FIREBASE PANEL MUSIC ---
         const firebaseConfig = {
-          apiKey: "AIzaSyDeY8c5o2m1j9oBbZtxsoZPOe_C2VkDIsk",
-          authDomain: "ayustudio-booking.firebaseapp.com",
-          projectId: "ayustudio-booking",
-          storageBucket: "ayustudio-booking.firebasestorage.app",
-          messagingSenderId: "374878980424",
-          appId: "1:374878980424:web:757591a982f2c32d160b7d",
-          measurementId: "G-W6834JLVHE"
+        apiKey: "AIzaSyAkXmReTZmz7xCO_GnRTfQ-xhXc-5WIy1E",
+        authDomain: "panelmusic-booking.firebaseapp.com",
+        projectId: "panelmusic-booking",
+        storageBucket: "panelmusic-booking.firebasestorage.app",
+        messagingSenderId: "759612402156",
+        appId: "1:759612402156:web:c4b782967a71c4f01678c9"
         };
 
         const app = initializeApp(firebaseConfig);
-        
-        // 💡 KODE SAKTI: Memaksa Long Polling agar lolos dari blokiran AdBlock / ISP Indonesia
-        const db = initializeFirestore(app, {
-            experimentalForceLongPolling: true
-        });
-
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
         const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 
         // --- SISTEM LOGIN ---
-        const PIN_RAHASIA = "TataCantik123";
+        const PIN_RAHASIA = "123456"; 
         const overlay = document.getElementById('login-overlay');
         if (sessionStorage.getItem('isAdminLoggedIn') === 'true') overlay.style.display = 'none';
 
@@ -269,28 +329,30 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-${tabName}`).classList.add('active');
             
-            const activeClass = "w-full flex items-center gap-3 bg-violet-600/10 text-violet-400 px-4 py-3 rounded-2xl font-bold text-sm border border-violet-500/20 transition-all";
+            const activeClass = "w-full flex items-center gap-3 bg-emerald-600/10 text-emerald-400 px-4 py-3 rounded-2xl font-bold text-sm border border-emerald-500/20 transition-all";
             const inactiveClass = "w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all";
             
-            const navDash = document.getElementById('nav-dashboard');
-            const navHist = document.getElementById('nav-history');
-            const mobDash = document.getElementById('mob-nav-dashboard');
-            const mobHist = document.getElementById('mob-nav-history');
+            const navs = ['dashboard', 'history', 'inventory'];
+            navs.forEach(nav => {
+                const deskNav = document.getElementById(`nav-${nav}`);
+                const mobNav = document.getElementById(`mob-nav-${nav}`);
+                if(deskNav) deskNav.className = (nav === tabName) ? activeClass : inactiveClass;
+                if(mobNav) mobNav.className = (nav === tabName) ? activeClass : inactiveClass;
+            });
             
             if(tabName === 'dashboard') {
                 document.getElementById('header-title').innerText = "Live Control";
                 document.getElementById('header-subtitle').innerText = "Admin Panel Real-time";
-                navDash.className = activeClass; navHist.className = inactiveClass;
-                if(mobDash) { mobDash.className = activeClass; mobHist.className = inactiveClass; }
-            } else {
+            } else if (tabName === 'history') {
                 document.getElementById('header-title').innerText = "Riwayat Transaksi";
                 document.getElementById('header-subtitle').innerText = "Data Penjualan Lunas";
-                navHist.className = activeClass; navDash.className = inactiveClass;
-                if(mobDash) { mobHist.className = activeClass; mobDash.className = inactiveClass; }
+            } else {
+                document.getElementById('header-title').innerText = "Inventaris Aset";
+                document.getElementById('header-subtitle').innerText = "Data Perlengkapan Studio";
             }
         };
 
-        // --- RENDER JADWAL FIREBASE (DENGAN BOOKING MANUAL) ---
+        // --- RENDER JADWAL FIREBASE ---
         const datePicker = document.getElementById('admin-date-picker');
         const d = new Date();
         const localISOTime = (new Date(d - (d.getTimezoneOffset() * 60000))).toISOString().slice(0, 10);
@@ -322,15 +384,15 @@
                     const slot = docSnap.data();
                     const btn = document.createElement('button');
                     
-                    let colorClass = "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-violet-500"; 
-                    if (slot.status === 'booked') colorClass = "bg-rose-900/20 border-rose-500 text-rose-500";
+                    let colorClass = "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-emerald-500"; 
+                    if (slot.status === 'booked') colorClass = "bg-[#111113] border-zinc-800 text-zinc-600"; // LUNAS
                     else if (slot.status === 'pending') colorClass = "bg-amber-900/20 border-amber-500 text-amber-500 animate-pulse";
                     else if (slot.status === 'blocked') colorClass = "bg-zinc-900 border-zinc-700 text-zinc-600";
                     
                     btn.className = `p-3 md:p-4 rounded-xl border-2 font-bold text-xs md:text-sm transition-all touch-manipulation flex flex-col items-center ${colorClass}`;
-                    btn.innerHTML = `${slot.time.split(' - ')[0]} <div class="text-[6px] md:text-[7px] uppercase tracking-widest mt-1 opacity-50 text-center w-full truncate">${slot.status}</div>`;
+                    btn.innerHTML = `${slot.time.split(' - ')[0]} <div class="text-[6px] md:text-[7px] uppercase tracking-widest mt-1 opacity-50 text-center w-full truncate">${slot.status === 'booked' ? 'LUNAS' : slot.status}</div>`;
                     
-                    // Aksi saat Admin klik slot jadwal
+                    // --- BOOKING MANUAL / BLOCK ADMIN ---
                     btn.onclick = async () => {
                         if (slot.status === 'pending') return alert("Slot sedang diproses pelanggan.");
                         
@@ -342,7 +404,7 @@
                             await updateDoc(doc(db, "slots_by_date", dateString, "items", docSnap.id), { status: 'available' });
                         } 
                         else if (slot.status === 'available') {
-                            const action = prompt("Ketik nama penyewa untuk BOOKING MANUAL\n(Atau ketik 'BLOCK' untuk sekadar memblokir jadwal ini):");
+                            const action = prompt("Ketik NAMA BAND penyewa untuk BOOKING MANUAL (Sistem akan menganggap ini bayar cash di tempat).\nAtau ketik 'BLOCK' untuk memblokir jadwal ini:");
                             if (action === null) return;
                             
                             const inputVal = action.trim();
@@ -350,13 +412,18 @@
                                 await updateDoc(doc(db, "slots_by_date", dateString, "items", docSnap.id), { status: 'blocked' });
                             } else if (inputVal !== '') {
                                 const bId = `MANUAL-${Math.floor(1000 + Math.random() * 9000)}`;
-                                const defaultPrice = 60000;
+                                const idBand = `BND-MANUAL`;
+                                const defaultPrice = 50000;
                                 
                                 await updateDoc(doc(db, "slots_by_date", dateString, "items", docSnap.id), { status: 'booked' });
                                 await addDoc(collection(db, "bookings"), {
                                     bookingId: bId,
+                                    kodeCabang: "BKS-01",
+                                    idBand: idBand,
                                     customerName: inputVal + " (Manual)",
-                                    service: "Booking Manual Admin",
+                                    namaPendaftar: "Admin",
+                                    noTelp: "-",
+                                    service: "Studio 1 (Manual)",
                                     date: dateString,
                                     time: slot.time,
                                     price: defaultPrice,
@@ -372,15 +439,11 @@
         };
 
         window.seedAdminDatabase = async (targetDate) => {
-            const slotsData = [
-                { id: 1, time: "10:00 - 11:00", status: "available" }, { id: 2, time: "11:00 - 12:00", status: "available" },
-                { id: 3, time: "12:00 - 13:00", status: "available" }, { id: 4, time: "13:00 - 14:00", status: "available" },
-                { id: 5, time: "14:00 - 15:00", status: "available" }, { id: 6, time: "15:00 - 16:00", status: "available" },
-                { id: 7, time: "16:00 - 17:00", status: "available" }, { id: 8, time: "17:00 - 18:00", status: "available" },
-                { id: 9, time: "18:00 - 19:00", status: "available" }, { id: 10, time: "19:00 - 20:00", status: "available" },
-                { id: 11, time: "20:00 - 21:00", status: "available" }, { id: 12, time: "21:00 - 22:00", status: "available" },
-                { id: 13, time: "22:00 - 23:00", status: "available" }
-            ];
+            const slotsData = [];
+            let idCounter = 1;
+            for(let i=9; i<=22; i++) {
+                slotsData.push({ id: idCounter++, time: `${i.toString().padStart(2, '0')}:00 - ${(i+1).toString().padStart(2, '0')}:00`, status: "available" });
+            }
             try {
                 const batch = writeBatch(db);
                 for (const slot of slotsData) {
@@ -395,8 +458,7 @@
         datePicker.addEventListener('change', (e) => { activeDate = e.target.value; loadSlotsForDate(activeDate); });
         loadSlotsForDate(activeDate);
 
-
-        // --- LOGIKA CHART & RENDER DATA DINAMIS ---
+        // --- CHART & DAFTAR BOOKING ---
         let revenueChartInstance = null;
         const ctx = document.getElementById('revenueChart').getContext('2d');
         Chart.defaults.color = '#a1a1aa';
@@ -404,60 +466,42 @@
         revenueChartInstance = new Chart(ctx, {
             type: 'line',
             data: { 
-                labels: [], 
-                datasets: [{ 
-                    label: 'Omset Harian', 
-                    data: [], 
-                    borderColor: '#7c3aed', 
-                    backgroundColor: 'rgba(124, 58, 237, 0.1)', 
-                    borderWidth: 3, 
-                    fill: true, 
-                    tension: 0.4, 
-                    pointBackgroundColor: '#10b981', 
-                    pointBorderColor: '#09090b', 
-                    pointRadius: 4 
+                labels: [], datasets: [{ 
+                    label: 'Omset Harian', data: [], 
+                    borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                    borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#10b981', pointBorderColor: '#09090b', pointRadius: 4 
                 }] 
             },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } },
-                scales: { 
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (value) => 'Rp ' + value/1000 + 'k' } }
-                }
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (value) => 'Rp ' + value/1000 + 'k' } } }
             }
         });
 
-        // Generate 7 Hari Terakhir
-        const last7Days = [];
-        const dayLabels = [];
+        const last7Days = []; const dayLabels = [];
         const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-        
         for (let i = 6; i >= 0; i--) {
-            const dateObj = new Date();
-            dateObj.setDate(dateObj.getDate() - i);
+            const dateObj = new Date(); dateObj.setDate(dateObj.getDate() - i);
             const tz = dateObj.getTimezoneOffset() * 60000;
             const isoString = (new Date(dateObj - tz)).toISOString().slice(0, 10);
-            
             last7Days.push(isoString);
-            if (i === 0) dayLabels.push('Hari Ini');
-            else dayLabels.push(days[dateObj.getDay()]);
+            if (i === 0) dayLabels.push('Hari Ini'); else dayLabels.push(days[dateObj.getDay()]);
         }
 
         const pendingList = document.getElementById('pending-list');
         const historyBody = document.getElementById('history-table-body');
-        
+        let fullBookingDataForExcel = []; // Simpan data untuk Excel
+
         onSnapshot(query(collection(db, "bookings"), orderBy("createdAt", "desc")), (snapshot) => {
             pendingList.innerHTML = '';
             historyBody.innerHTML = '';
-            let pendingCount = 0;
-            let totalRevSemua = 0; 
-            let totalSesiLunas = 0;
-            let chartData = [0, 0, 0, 0, 0, 0, 0]; 
+            fullBookingDataForExcel = []; // Reset
+            let pendingCount = 0; let totalRevSemua = 0; let totalSesiLunas = 0; let chartData = [0, 0, 0, 0, 0, 0, 0]; 
 
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
+                fullBookingDataForExcel.push({id: docSnap.id, ...data});
+
                 const custName = data.customerName || "Tanpa Nama";
                 const bId = data.bookingId || docSnap.id.substring(0,6).toUpperCase();
                 
@@ -475,7 +519,7 @@
                                 <div class="text-white font-black text-sm uppercase pr-2 truncate">${custName}</div>
                                 <div class="text-emerald-400 font-black text-sm italic shrink-0">${formatRp(data.price)}</div>
                             </div>
-                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">${data.service} • ${timeStr}</div>
+                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">${data.service} • Order: ${timeStr}</div>
                         </div>
                         <div class="flex justify-between items-center bg-zinc-900 rounded-lg p-2 mb-3 border border-zinc-800/50 ml-2">
                              <div class="text-center flex-1 border-r border-zinc-800">
@@ -488,8 +532,8 @@
                              </div>
                         </div>
                         <div class="flex gap-2 ml-2">
-                            <button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.date}', '${data.time}')">TERIMA</button>
-                            <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.date}', '${data.time}')">TOLAK</button>
+                            <button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.date}', '${data.time}')">LUNAS (KASIR)</button>
+                            <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.date}', '${data.time}')">BATALKAN</button>
                         </div>
                     `;
                     pendingList.appendChild(item);
@@ -499,9 +543,7 @@
                     totalSesiLunas++;
 
                     const dateIndex = last7Days.indexOf(data.date);
-                    if (dateIndex !== -1) {
-                        chartData[dateIndex] += data.price;
-                    }
+                    if (dateIndex !== -1) chartData[dateIndex] += data.price;
                     
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-zinc-800/30 transition-colors group";
@@ -512,14 +554,19 @@
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30">
                             <div class="font-black text-white text-xs mb-0.5">${custName}</div>
-                            <span class="bg-emerald-500/10 text-emerald-500 text-[8px] px-2 py-0.5 rounded-md uppercase font-bold">Lunas</span>
+                            <div class="text-[9px] text-zinc-500">ID: ${data.idBand || '-'}</div>
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30">
                             <div class="text-xs font-bold text-zinc-300 truncate max-w-[150px]">${data.service}</div>
+                            <div class="text-[9px] text-emerald-500 font-bold mt-0.5">+ ${data.addons || 'Tidak Ada'}</div>
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30">
                             <div class="text-xs font-bold text-white mb-0.5">${data.date}</div>
-                            <div class="text-violet-400 font-bold text-[10px]">${data.time}</div>
+                            <div class="text-amber-400 font-bold text-[10px]">${data.time}</div>
+                        </td>
+                        <td class="py-4 px-4 border-b border-zinc-800/30 max-w-[150px]">
+                            <div class="text-[9px] text-zinc-400 truncate">CP: ${data.namaPendaftar || '-'} (${data.noTelp || '-'})</div>
+                            <div class="text-[9px] text-zinc-400 truncate">Ket: ${data.note || '-'}</div>
                         </td>
                         <td class="py-4 px-4 text-right font-black italic text-emerald-400 text-sm border-b border-zinc-800/30">${formatRp(data.price)}</td>
                     `;
@@ -527,12 +574,8 @@
                 }
             });
 
-            if (pendingCount === 0) {
-                pendingList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-zinc-600 min-h-[200px]"><span class="text-3xl mb-2 opacity-50">🎉</span><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Semua Clear!</p></div>`;
-            }
-            if (totalRevSemua === 0) {
-                historyBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Belum ada transaksi sukses.</td></tr>`;
-            }
+            if (pendingCount === 0) pendingList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-zinc-600 min-h-[200px]"><span class="text-3xl mb-2 opacity-50">☕</span><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Tidak Ada Antrean Kasir</p></div>`;
+            if (totalRevSemua === 0) historyBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Belum ada transaksi sukses.</td></tr>`;
             
             document.getElementById('kpi-pending').innerText = `${pendingCount} Antrean`;
             document.getElementById('kpi-revenue').innerText = formatRp(totalRevSemua);
@@ -543,9 +586,9 @@
             revenueChartInstance.update();
         });
 
-        // --- AKSI TERIMA/TOLAK BUKTI WA ---
+        // --- AKSI TERIMA(LUNAS)/TOLAK ---
         window.approveBooking = async (id, targetDate, times) => {
-            if(!confirm(`Setujui pembayaran ini untuk tanggal ${targetDate}?`)) return;
+            if(!confirm(`Konfirmasi pembayaran di kasir telah diterima untuk tanggal ${targetDate}?`)) return;
             await updateDoc(doc(db, "bookings", id), { status: "approved" });
             
             const timeArray = times.split(', ');
@@ -559,7 +602,7 @@
         };
 
         window.rejectBooking = async (id, targetDate, times) => {
-            if(!confirm(`Yakin tolak booking ini? Jadwal tanggal ${targetDate} akan kembali kosong.`)) return;
+            if(!confirm(`Yakin membatalkan booking ini? Jadwal tanggal ${targetDate} akan kembali KOSONG.`)) return;
             await deleteDoc(doc(db, "bookings", id));
             
             const timeArray = times.split(', ');
@@ -571,6 +614,99 @@
                 }
             });
         };
+
+        // --- TOMBOL EXPORT EXCEL SAKTI (.CSV) ---
+        window.exportToExcel = () => {
+            if (fullBookingDataForExcel.length === 0) return alert("Belum ada data transaksi!");
+            
+            // Header sesuai request klien
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Kode Cabang,Tgl Main,Jam Main,No. Tiket,Nama Band - ID Band,No. Studio / Layanan,Rp. Cash,Rp. TF,Status Transaksi,Add Alat,Note\n";
+
+            fullBookingDataForExcel.forEach(d => {
+                if(d.status === 'approved') {
+                    // Bersihkan koma agar format CSV tidak berantakan
+                    const note = d.note ? d.note.replace(/,/g, " ") : "-";
+                    const addons = d.addons ? d.addons.replace(/,/g, " & ") : "-";
+                    
+                    const row = [
+                        d.kodeCabang || "BKS-01",
+                        d.date,
+                        `"${d.time}"`,
+                        d.bookingId,
+                        `${d.customerName} - ${d.idBand}`,
+                        d.service,
+                        d.price, // Rp Cash (Karena bayar di tempat)
+                        0, // Rp TF (Kosong)
+                        d.status,
+                        `"${addons}"`,
+                        `"${note}"`
+                    ];
+                    csvContent += row.join(",") + "\n";
+                }
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Transaksi_Panel_Music_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // --- FITUR INVENTARIS STUDIO ---
+        window.addInventory = async () => {
+            const kat = document.getElementById('inv-kategori').value;
+            const nama = document.getElementById('inv-nama').value;
+            const merk = document.getElementById('inv-merk').value;
+            const kondisi = document.getElementById('inv-kondisi').value;
+            const harga = document.getElementById('inv-harga').value;
+
+            if(!nama || !merk) return alert("Nama alat dan Merk wajib diisi!");
+
+            await addDoc(collection(db, "inventory"), {
+                lokasi: kat, nama: nama, merk: merk, kondisi: kondisi, infoBeli: harga, createdAt: new Date().toISOString()
+            });
+
+            // Reset Form
+            document.getElementById('inv-nama').value = '';
+            document.getElementById('inv-merk').value = '';
+            document.getElementById('inv-kondisi').value = '';
+            document.getElementById('inv-harga').value = '';
+            alert("Data alat berhasil disimpan!");
+        };
+
+        window.deleteInventory = async (id) => {
+            if(!confirm("Hapus alat ini dari daftar inventaris?")) return;
+            await deleteDoc(doc(db, "inventory", id));
+        };
+
+        onSnapshot(query(collection(db, "inventory"), orderBy("createdAt", "desc")), (snapshot) => {
+            const invList = document.getElementById('inventory-list');
+            invList.innerHTML = '';
+            if(snapshot.empty) {
+                invList.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-zinc-600 text-xs">Belum ada alat yang dicatat.</td></tr>`;
+                return;
+            }
+            
+            snapshot.forEach((docSnap) => {
+                const d = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-zinc-800/30 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 border-b border-zinc-800/30"><span class="bg-zinc-800 text-zinc-300 px-2 py-1 rounded text-[10px] uppercase font-bold">${d.lokasi}</span></td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 font-bold text-white">${d.nama} <span class="text-emerald-500 ml-1">(${d.merk})</span></td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-xs text-zinc-400">${d.kondisi || '-'}</td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-xs text-zinc-400">${d.infoBeli || '-'}</td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-right">
+                        <button onclick="deleteInventory('${docSnap.id}')" class="text-rose-500 hover:text-rose-400 text-[10px] font-black uppercase underline">Hapus</button>
+                    </td>
+                `;
+                invList.appendChild(tr);
+            });
+        });
+
     </script>
 </body>
 </html>
