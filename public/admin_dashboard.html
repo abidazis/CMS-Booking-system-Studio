@@ -232,6 +232,10 @@
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Tgl Beli & Harga</label>
                                 <input type="text" id="inv-harga" placeholder="Jan 2025 - Rp 1.5jt" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">URL Foto (Opsional)</label>
+                                <input type="text" id="inv-image" placeholder="Link gambar dari Web / Kosongkan" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            </div>
                             <button onclick="addInventory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 mt-2">
                                 Simpan Data Alat
                             </button>
@@ -662,11 +666,19 @@
             const merk = document.getElementById('inv-merk').value;
             const kondisi = document.getElementById('inv-kondisi').value;
             const harga = document.getElementById('inv-harga').value;
+            const imageUrl = document.getElementById('inv-image').value; // <-- Tarik data URL
 
             if(!nama || !merk) return alert("Nama alat dan Merk wajib diisi!");
 
+            // Masukkan imageUrl ke Firebase
             await addDoc(collection(db, "inventory"), {
-                lokasi: kat, nama: nama, merk: merk, kondisi: kondisi, infoBeli: harga, createdAt: new Date().toISOString()
+                lokasi: kat, 
+                nama: nama, 
+                merk: merk, 
+                kondisi: kondisi, 
+                infoBeli: harga, 
+                imageUrl: imageUrl, // <-- Simpan ke database
+                createdAt: new Date().toISOString()
             });
 
             // Reset Form
@@ -674,6 +686,7 @@
             document.getElementById('inv-merk').value = '';
             document.getElementById('inv-kondisi').value = '';
             document.getElementById('inv-harga').value = '';
+            document.getElementById('inv-image').value = ''; // <-- Kosongkan input URL
             alert("Data alat berhasil disimpan!");
         };
 

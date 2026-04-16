@@ -87,6 +87,7 @@ export default function App() {
   
   const [ticketData, setTicketData] = useState(null); 
   const [toast, setToast] = useState(null); 
+  const [inventoryData, setInventoryData] = useState([]);
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type }); setTimeout(() => setToast(null), 4000);
@@ -107,6 +108,16 @@ export default function App() {
     });
     return () => unsubscribe();
   }, [selectedDate]);
+
+  // --- AMBIL DATA INVENTARIS DARI ADMIN ---
+  useEffect(() => {
+    if (!db) return;
+    const q = query(collection(db, "inventory"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setInventoryData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
 
   const isPastTime = (slotTime) => {
     const todayStr = getDateLabel(0);
@@ -393,6 +404,67 @@ export default function App() {
           </Reveal>
         </div>
       </section>
+
+     {/* FASILITAS & GEAR LIST (Terkoneksi dari Admin) */}
+      {inventoryData.length > 0 && (
+        <section className="py-16 md:py-24 px-5 md:px-6 relative w-full border-t border-zinc-900 bg-[#111113]">
+          <div className="max-w-7xl mx-auto relative z-10 w-full">
+            <Reveal>
+              <div className="text-center mb-10 md:mb-16">
+                <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter">Fasilitas <span className="text-emerald-500">& Gear</span></h2>
+                <p className="text-zinc-400 mt-2 text-[10px] md:text-xs tracking-widest uppercase font-bold">Peralatan yang tersedia di studio kami</p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+                {inventoryData.map((item) => {
+                  // LOGIKA JALUR NINJA: Foto Otomatis Berdasarkan Nama Alat!
+                  let autoImage = "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=600"; // Default Studio
+                  const n = item.nama.toLowerCase();
+                  if(n.includes('drum')) autoImage = "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&q=80&w=600";
+                  else if(n.includes('gitar') || n.includes('guitar')) autoImage = "https://images.unsplash.com/photo-1511335513650-807809322b5e?auto=format&fit=crop&q=80&w=600";
+                  else if(n.includes('bass')) autoImage = "https://images.unsplash.com/photo-1512684051462-9d50fb229fed?auto=format&fit=crop&q=80&w=600";
+                  else if(n.includes('mic') || n.includes('vokal')) autoImage = "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=600";
+                  else if(n.includes('ampli') || n.includes('head')) autoImage = "https://images.unsplash.com/photo-1563330232-57114bb0823c?auto=format&fit=crop&q=80&w=600";
+                  else if(n.includes('cymbal') || n.includes('simbal')) autoImage = "https://images.unsplash.com/photo-1591604122177-802af0d0c3eb?auto=format&fit=crop&q=80&w=600";
+
+                  // Jika admin ngisi link foto sendiri, pakai link admin. Kalau kosong, pakai foto otomatis.
+                  const finalImage = item.imageUrl || autoImage;
+
+                  return (
+                    <div key={item.id} className="bg-zinc-900/40 rounded-2xl border border-zinc-800 flex flex-col hover:border-emerald-500/50 transition-all duration-300 overflow-hidden group hover:shadow-[0_10px_30px_-15px_rgba(16,185,129,0.3)]">
+                      
+                      {/* Area Gambar */}
+                      <div className="w-full h-40 md:h-48 overflow-hidden relative">
+                         <img src={finalImage} alt={item.nama} className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+                         <div className="absolute top-3 right-3 bg-zinc-950/80 backdrop-blur-md text-zinc-300 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black border border-zinc-800 shadow-xl">
+                            {item.lokasi}
+                         </div>
+                      </div>
+                      
+                      {/* Area Teks Konten */}
+                      <div className="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-white font-black text-lg md:text-xl leading-tight mb-4">{item.nama}</h4>
+                          <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-500 mb-2 border-b border-zinc-800/50 pb-2">
+                             <span>Merk/Brand</span>
+                             <span className="text-emerald-400 text-right">{item.merk}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-500">
+                             <span>Kondisi Alat</span>
+                             <span className="text-zinc-300 text-right">{item.kondisi}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
 
       {/* CORE: SMART BOOKING ENGINE (PANEL MUSIC) */}
       <section id="booking" className="py-16 md:py-32 px-4 md:px-6 relative w-full border-t border-zinc-900 bg-zinc-950/30">
