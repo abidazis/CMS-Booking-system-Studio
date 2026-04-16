@@ -20,7 +20,7 @@ const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 // --- ASSETS & ICONS ---
 const ASSETS = {
   logo: "/logo.png", 
-  hero_utama: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop", 
+  hero_utama: "/studio.jpg", 
 };
 
 const Icons = {
