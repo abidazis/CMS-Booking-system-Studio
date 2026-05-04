@@ -201,18 +201,22 @@
             <div id="tab-inventory" class="tab-content w-full min-w-0">
                 <div class="grid xl:grid-cols-3 gap-6 w-full min-w-0">
                     
-                    <!-- Kiri: Form Tambah Alat -->
+                    <!-- Kiri: Form Tambah/Edit Alat -->
                     <div class="xl:col-span-1 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full h-fit">
-                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Tambah Inventaris</h3>
+                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5" id="form-inv-title">Tambah Inventaris</h3>
+                        <input type="hidden" id="inv-id" value="">
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kategori / Studio</label>
-                                <select id="inv-kategori" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
-                                    <option value="Studio 1">Studio 1</option>
-                                    <option value="Studio 2">Studio 2</option>
-                                    <option value="Studio 3">Studio 3</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">No. Studio</label>
+                                    <select id="inv-nostudio" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                        <option value="Studio 1">Studio 1</option><option value="Studio 2">Studio 2</option><option value="Studio 3">Studio 3</option><option value="Luar Studio">Luar Studio</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kategori</label>
+                                    <input type="text" id="inv-kategori" placeholder="Cth: Drum / Gitar" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Nama Alat</label>
@@ -220,25 +224,50 @@
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Merk / SN</label>
-                                    <input type="text" id="inv-merk" placeholder="Sonor / SN123" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Serial Number (SN)</label>
+                                    <input type="text" id="inv-sn" placeholder="SN12345" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kondisi</label>
-                                    <input type="text" id="inv-kondisi" placeholder="Oke / Rusak" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Status Alat</label>
+                                    <select id="inv-status" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                        <option value="Tersedia">Tersedia</option><option value="Dipinjam">Dipinjam</option><option value="Rusak">Rusak</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Tgl Beli</label>
+                                    <input type="date" id="inv-tglbeli" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Harga Beli</label>
+                                    <input type="number" id="inv-hargabeli" placeholder="1500000" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Nama Toko</label>
+                                    <input type="text" id="inv-namatoko" placeholder="Toko Nada" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">No Kontak Toko</label>
+                                    <input type="text" id="inv-kontaktoko" placeholder="0812..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Tgl Beli & Harga</label>
-                                <input type="text" id="inv-harga" placeholder="Jan 2025 - Rp 1.5jt" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Catatan / Noted</label>
+                                <input type="text" id="inv-noted" placeholder="Catatan alat..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">URL Foto (Opsional)</label>
                                 <input type="text" id="inv-image" placeholder="Link gambar dari Web / Kosongkan" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
-                            <button onclick="addInventory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 mt-2">
-                                Simpan Data Alat
-                            </button>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="resetInvForm()" type="button" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-widest text-[10px] px-4 py-4 rounded-xl transition-all">Batal</button>
+                                <button onclick="saveInventory()" id="btn-save-inv" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95">
+                                    Simpan Data Alat
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -512,7 +541,7 @@
                 const dateObj = new Date(data.createdAt);
                 const timeStr = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth()+1).toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
                 
-                if (data.status === 'pending') {
+                if (data.statusTransaksi === 'Menunggu Approval') {
                     pendingCount++;
                     const item = document.createElement('div');
                     item.className = "bg-zinc-950 p-4 rounded-xl border border-zinc-800 shadow-md mb-3 relative overflow-hidden";
@@ -542,7 +571,7 @@
                     `;
                     pendingList.appendChild(item);
                 } 
-                else if (data.status === 'approved') {
+                else if (data.statusTransaksi === 'approved') {
                     totalRevSemua += data.price; 
                     totalSesiLunas++;
 
@@ -593,7 +622,7 @@
         // --- AKSI TERIMA(LUNAS)/TOLAK ---
         window.approveBooking = async (id, targetDate, times) => {
             if(!confirm(`Konfirmasi pembayaran di kasir telah diterima untuk tanggal ${targetDate}?`)) return;
-            await updateDoc(doc(db, "bookings", id), { status: "approved" });
+            await updateDoc(doc(db, "transaksi", id), { statusTransaksi: "approved" });
             
             const timeArray = times.split(', ');
             const slotsSnap = await getDocs(collection(db, "slots_by_date", targetDate, "items"));
@@ -623,27 +652,27 @@
         window.exportToExcel = () => {
             if (fullBookingDataForExcel.length === 0) return alert("Belum ada data transaksi!");
             
-            // Header sesuai request klien
+            // Header 11 Kolom persis seperti request klien Panel Music
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Kode Cabang,Tgl Main,Jam Main,No. Tiket,Nama Band - ID Band,No. Studio / Layanan,Rp. Cash,Rp. TF,Status Transaksi,Add Alat,Note\n";
+            csvContent += "Kode Cabang,Tgl. main,Jam main,No. Tiket,Nama band - id band,No. Studio,Rp. cash,Rp. TF,Status transaksi,Add Alat,Note\n";
 
             fullBookingDataForExcel.forEach(d => {
-                if(d.status === 'approved') {
-                    // Bersihkan koma agar format CSV tidak berantakan
-                    const note = d.note ? d.note.replace(/,/g, " ") : "-";
-                    const addons = d.addons ? d.addons.replace(/,/g, " & ") : "-";
+                if(d.statusTransaksi === 'approved') {
+                    // Bersihkan koma agar format kolom CSV tidak pecah/berantakan
+                    const note = d.note ? String(d.note).replace(/,/g, " ") : "-";
+                    const addAlat = d.addAlat ? String(d.addAlat).replace(/,/g, " & ") : "Tidak";
                     
                     const row = [
-                        d.kodeCabang || "BKS-01",
-                        d.date,
-                        `"${d.time}"`,
-                        d.bookingId,
-                        `${d.customerName} - ${d.idBand}`,
-                        d.service,
-                        d.price, // Rp Cash (Karena bayar di tempat)
-                        0, // Rp TF (Kosong)
-                        d.status,
-                        `"${addons}"`,
+                        d.kodeCabang || "PNL-01",
+                        d.tglMain || "-",
+                        `"${d.jamMain || "-"}"`,
+                        d.noTiket || "-",
+                        `${d.namaBand || "-"} - ${d.idBand || "-"}`,
+                        d.noStudio || "-",
+                        d.rpCash || 0,
+                        d.rpTf || 0, // Default 0 karena sistem bayar di kasir
+                        d.statusTransaksi || "-",
+                        `"${addAlat}"`,
                         `"${note}"`
                     ];
                     csvContent += row.join(",") + "\n";
@@ -653,41 +682,75 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Laporan_Transaksi_Panel_Music_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `Laporan_Transaksi_PanelMusic_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         };
-
-        // --- FITUR INVENTARIS STUDIO ---
-        window.addInventory = async () => {
-            const kat = document.getElementById('inv-kategori').value;
-            const nama = document.getElementById('inv-nama').value;
-            const merk = document.getElementById('inv-merk').value;
-            const kondisi = document.getElementById('inv-kondisi').value;
-            const harga = document.getElementById('inv-harga').value;
-            const imageUrl = document.getElementById('inv-image').value; // <-- Tarik data URL
-
-            if(!nama || !merk) return alert("Nama alat dan Merk wajib diisi!");
-
-            // Masukkan imageUrl ke Firebase
-            await addDoc(collection(db, "inventory"), {
-                lokasi: kat, 
-                nama: nama, 
-                merk: merk, 
-                kondisi: kondisi, 
-                infoBeli: harga, 
-                imageUrl: imageUrl, // <-- Simpan ke database
-                createdAt: new Date().toISOString()
-            });
-
-            // Reset Form
+        // --- FITUR INVENTARIS STUDIO (LENGKAP 12 KOLOM + EDIT + HAPUS) ---
+        window.resetInvForm = () => {
+            document.getElementById('inv-id').value = '';
+            document.getElementById('form-inv-title').innerText = 'Tambah Inventaris';
+            document.getElementById('btn-save-inv').innerText = 'Simpan Data Alat';
+            document.getElementById('inv-nostudio').value = 'Studio 1';
+            document.getElementById('inv-kategori').value = '';
             document.getElementById('inv-nama').value = '';
-            document.getElementById('inv-merk').value = '';
-            document.getElementById('inv-kondisi').value = '';
-            document.getElementById('inv-harga').value = '';
-            document.getElementById('inv-image').value = ''; // <-- Kosongkan input URL
-            alert("Data alat berhasil disimpan!");
+            document.getElementById('inv-sn').value = '';
+            document.getElementById('inv-status').value = 'Tersedia';
+            document.getElementById('inv-tglbeli').value = '';
+            document.getElementById('inv-hargabeli').value = '';
+            document.getElementById('inv-namatoko').value = '';
+            document.getElementById('inv-kontaktoko').value = '';
+            document.getElementById('inv-noted').value = '';
+            document.getElementById('inv-image').value = '';
+        };
+
+        window.saveInventory = async () => {
+            const id = document.getElementById('inv-id').value;
+            const data = {
+                noStudio: document.getElementById('inv-nostudio').value,
+                kategori: document.getElementById('inv-kategori').value,
+                nama: document.getElementById('inv-nama').value,
+                sn: document.getElementById('inv-sn').value,
+                statusAlat: document.getElementById('inv-status').value,
+                tglbeli: document.getElementById('inv-tglbeli').value,
+                hargabeli: document.getElementById('inv-hargabeli').value,
+                namatoko: document.getElementById('inv-namatoko').value,
+                kontaktoko: document.getElementById('inv-kontaktoko').value,
+                noted: document.getElementById('inv-noted').value,
+                imageUrl: document.getElementById('inv-image').value,
+                kodeCabang: "PNL-01"
+            };
+
+            if(!data.nama || !data.kategori) return alert("Nama alat dan Kategori wajib diisi!");
+
+            if (id) {
+                await updateDoc(doc(db, "inventory", id), data);
+                alert("Data alat berhasil diupdate!");
+            } else {
+                data.createdAt = new Date().toISOString();
+                await addDoc(collection(db, "inventory"), data);
+                alert("Data alat berhasil disimpan!");
+            }
+            resetInvForm();
+        };
+
+        window.editInventory = (id, dataStr) => {
+            const d = JSON.parse(decodeURIComponent(dataStr));
+            document.getElementById('inv-id').value = id;
+            document.getElementById('form-inv-title').innerText = 'Edit Inventaris';
+            document.getElementById('btn-save-inv').innerText = 'Update Data Alat';
+            document.getElementById('inv-nostudio').value = d.noStudio || 'Studio 1';
+            document.getElementById('inv-kategori').value = d.kategori || '';
+            document.getElementById('inv-nama').value = d.nama || '';
+            document.getElementById('inv-sn').value = d.sn || '';
+            document.getElementById('inv-status').value = d.statusAlat || 'Tersedia';
+            document.getElementById('inv-tglbeli').value = d.tglbeli || '';
+            document.getElementById('inv-hargabeli').value = d.hargabeli || '';
+            document.getElementById('inv-namatoko').value = d.namatoko || '';
+            document.getElementById('inv-kontaktoko').value = d.kontaktoko || '';
+            document.getElementById('inv-noted').value = d.noted || '';
+            document.getElementById('inv-image').value = d.imageUrl || '';
         };
 
         window.deleteInventory = async (id) => {
@@ -695,31 +758,130 @@
             await deleteDoc(doc(db, "inventory", id));
         };
 
-        onSnapshot(query(collection(db, "inventory"), orderBy("createdAt", "desc")), (snapshot) => {
-            const invList = document.getElementById('inventory-list');
-            invList.innerHTML = '';
-            if(snapshot.empty) {
-                invList.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-zinc-600 text-xs">Belum ada alat yang dicatat.</td></tr>`;
-                return;
-            }
-            
+        onSnapshot(query(collection(db, "transaksi"), orderBy("createdAt", "desc")), (snapshot) => {
+            pendingList.innerHTML = '';
+            historyBody.innerHTML = '';
+            fullBookingDataForExcel = []; // Reset
+            let pendingCount = 0; let totalRevSemua = 0; let totalSesiLunas = 0; let chartData = [0, 0, 0, 0, 0, 0, 0]; 
+
             snapshot.forEach((docSnap) => {
-                const d = docSnap.data();
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-zinc-800/30 transition-colors";
-                tr.innerHTML = `
-                    <td class="py-3 px-3 border-b border-zinc-800/30"><span class="bg-zinc-800 text-zinc-300 px-2 py-1 rounded text-[10px] uppercase font-bold">${d.lokasi}</span></td>
-                    <td class="py-3 px-3 border-b border-zinc-800/30 font-bold text-white">${d.nama} <span class="text-emerald-500 ml-1">(${d.merk})</span></td>
-                    <td class="py-3 px-3 border-b border-zinc-800/30 text-xs text-zinc-400">${d.kondisi || '-'}</td>
-                    <td class="py-3 px-3 border-b border-zinc-800/30 text-xs text-zinc-400">${d.infoBeli || '-'}</td>
-                    <td class="py-3 px-3 border-b border-zinc-800/30 text-right">
-                        <button onclick="deleteInventory('${docSnap.id}')" class="text-rose-500 hover:text-rose-400 text-[10px] font-black uppercase underline">Hapus</button>
-                    </td>
-                `;
-                invList.appendChild(tr);
+                const data = docSnap.data();
+                fullBookingDataForExcel.push({id: docSnap.id, ...data});
+
+                // PENYESUAIAN KE NAMA KOLOM BARU KLIEN
+                const custName = data.namaBand || "Tanpa Nama";
+                const bId = data.noTiket || docSnap.id.substring(0,6).toUpperCase();
+                const tagihan = data.totalTagihan || data.rpCash || 0; // Ambil nominal harga
+                
+                const dateObj = new Date(data.createdAt);
+                const timeStr = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth()+1).toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+                
+                if (data.statusTransaksi === 'Menunggu Approval') {
+                    pendingCount++;
+                    const item = document.createElement('div');
+                    item.className = "bg-zinc-950 p-4 rounded-xl border border-zinc-800 shadow-md mb-3 relative overflow-hidden";
+                    item.innerHTML = `
+                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                        <div class="flex flex-col mb-3 pb-3 border-b border-zinc-800/50 pl-2">
+                            <div class="flex justify-between items-start mb-1">
+                                <div class="text-white font-black text-sm uppercase pr-2 truncate">${custName}</div>
+                                <div class="text-emerald-400 font-black text-sm italic shrink-0">${formatRp(tagihan)}</div>
+                            </div>
+                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">${data.noStudio} • Order: ${timeStr}</div>
+                        </div>
+                        <div class="flex justify-between items-center bg-zinc-900 rounded-lg p-2 mb-3 border border-zinc-800/50 ml-2">
+                             <div class="text-center flex-1 border-r border-zinc-800">
+                                <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Tgl Main</div>
+                                <div class="text-white text-[10px] md:text-xs font-bold">${data.tglMain}</div>
+                             </div>
+                             <div class="text-center flex-1">
+                                <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Jam</div>
+                                <div class="text-white text-[10px] md:text-xs font-bold">${data.jamMain}</div>
+                             </div>
+                        </div>
+                        <div class="flex gap-2 ml-2">
+                            <button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}', ${tagihan})">LUNAS (KASIR)</button>
+                            <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}')">BATALKAN</button>
+                        </div>
+                    `;
+                    pendingList.appendChild(item);
+                } 
+                else if (data.statusTransaksi === 'approved') {
+                    totalRevSemua += data.rpCash; 
+                    totalSesiLunas++;
+
+                    const dateIndex = last7Days.indexOf(data.tglMain);
+                    if (dateIndex !== -1) chartData[dateIndex] += data.rpCash;
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-zinc-800/30 transition-colors group";
+                    tr.innerHTML = `
+                        <td class="py-4 px-4 border-b border-zinc-800/30">
+                            <div class="text-[10px] font-mono text-zinc-400 mb-0.5">${bId}</div>
+                            <div class="text-[9px] font-bold text-zinc-500 tracking-wider">${timeStr}</div>
+                        </td>
+                        <td class="py-4 px-4 border-b border-zinc-800/30">
+                            <div class="font-black text-white text-xs mb-0.5">${custName}</div>
+                            <div class="text-[9px] text-zinc-500">ID: ${data.idBand || '-'}</div>
+                        </td>
+                        <td class="py-4 px-4 border-b border-zinc-800/30">
+                            <div class="text-xs font-bold text-zinc-300 truncate max-w-[150px]">${data.noStudio}</div>
+                            <div class="text-[9px] text-emerald-500 font-bold mt-0.5">+ ${data.addAlat || 'Tidak Ada'}</div>
+                        </td>
+                        <td class="py-4 px-4 border-b border-zinc-800/30">
+                            <div class="text-xs font-bold text-white mb-0.5">${data.tglMain}</div>
+                            <div class="text-amber-400 font-bold text-[10px]">${data.jamMain}</div>
+                        </td>
+                        <td class="py-4 px-4 border-b border-zinc-800/30 max-w-[150px]">
+                            <div class="text-[9px] text-zinc-400 truncate">Note: ${data.note || '-'}</div>
+                        </td>
+                        <td class="py-4 px-4 text-right font-black italic text-emerald-400 text-sm border-b border-zinc-800/30">${formatRp(data.rpCash)}</td>
+                    `;
+                    historyBody.appendChild(tr);
+                }
             });
+
+            if (pendingCount === 0) pendingList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-zinc-600 min-h-[200px]"><span class="text-3xl mb-2 opacity-50">☕</span><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Tidak Ada Antrean Kasir</p></div>`;
+            if (totalRevSemua === 0) historyBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Belum ada transaksi sukses.</td></tr>`;
+            
+            document.getElementById('kpi-pending').innerText = `${pendingCount} Antrean`;
+            document.getElementById('kpi-revenue').innerText = formatRp(totalRevSemua);
+            document.getElementById('kpi-bookings').innerText = `${totalSesiLunas} Sesi`;
+
+            revenueChartInstance.data.labels = dayLabels;
+            revenueChartInstance.data.datasets[0].data = chartData;
+            revenueChartInstance.update();
         });
 
+        // --- AKSI TERIMA(LUNAS)/TOLAK ---
+        window.approveBooking = async (id, targetDate, times, tagihan) => {
+            if(!confirm(`Terima pembayaran di kasir sebesar ${formatRp(tagihan)}?`)) return;
+            // Update status dan masukkan nominal tagihan ke rpCash
+            await updateDoc(doc(db, "transaksi", id), { statusTransaksi: "approved", rpCash: tagihan });
+            
+            const timeArray = times.split(', ');
+            const slotsSnap = await getDocs(collection(db, "slots_by_date", targetDate, "items"));
+            slotsSnap.forEach(async (slotDoc) => {
+                const slotData = slotDoc.data();
+                if (timeArray.includes(slotData.time) && slotData.status === 'pending') {
+                    await updateDoc(doc(db, "slots_by_date", targetDate, "items", slotDoc.id), { status: 'booked' });
+                }
+            });
+        };
+
+        window.rejectBooking = async (id, targetDate, times) => {
+            if(!confirm(`Yakin membatalkan booking ini? Jadwal tanggal ${targetDate} akan kembali KOSONG.`)) return;
+            await deleteDoc(doc(db, "transaksi", id));
+            
+            const timeArray = times.split(', ');
+            const slotsSnap = await getDocs(collection(db, "slots_by_date", targetDate, "items"));
+            slotsSnap.forEach(async (slotDoc) => {
+                const slotData = slotDoc.data();
+                if (timeArray.includes(slotData.time) && slotData.status === 'pending') {
+                    await updateDoc(doc(db, "slots_by_date", targetDate, "items", slotDoc.id), { status: 'available' });
+                }
+            });
+        };
     </script>
 </body>
 </html>

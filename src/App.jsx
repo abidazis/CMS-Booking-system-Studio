@@ -57,6 +57,7 @@ const SERVICES = [
   { id: 'rec_live', name: 'LiveTrack Rec', category: 'Recording', price: 120000, icon: '🎛️' },
   { id: 'rec_1hr', name: 'Track Rec (1 Jam)', category: 'Recording', price: 120000, icon: '🎙️' },
   { id: 'rec_shift', name: 'Track Rec (1 Shift / 6 Jam)', category: 'Recording', price: 850000, icon: '🎧' },
+  { id: 'sewa_alat', name: 'Sewa Alat Musik (Bawa Keluar)', category: 'Sewa Alat Musik', price: 150000, icon: '🎹' },
 ];
 
 const ADDONS = [
@@ -201,11 +202,9 @@ export default function App() {
     setIsProcessing(true);
     const waNumber = "6281390006257"; // GANTI NOMOR WA STUDIO PANEL MUSIC DI SINI
     
-    // Logic Auto ID Panel Music (4 digit terakhir HP + Random)
-    const hpAkhir = formData.noTelp.slice(-4) || "0000";
+    // Logic Auto ID Tiket Panel Music
     const randomCode = Math.floor(100 + Math.random() * 900);
-    const idBand = `BND-${hpAkhir}`;
-    const bookingId = `2026-${randomCode}`; // Format tiket: 2026-XXXX
+    const ticketNo = `2026-${randomCode}`; // Format tiket: 2026-XXXX
 
     try {
       // 1. Kunci Jadwal Langsung (Pending / Kuning di Admin)
@@ -213,23 +212,32 @@ export default function App() {
         await updateDoc(doc(db, "slots_by_date", selectedDate, "items", String(slot.id)), { status: 'pending' });
       }
 
-      // 2. Simpan Data Super Lengkap ke Database Admin (Buat Excel)
-      await addDoc(collection(db, "bookings"), {
-        bookingId: bookingId,
-        kodeCabang: "BKS-01",
-        idBand: idBand,
-        customerName: formData.namaBand, 
-        namaPendaftar: formData.namaPendaftar,
+      // 2A. Simpan Data ke Tabel MASTER BAND (Sesuai Request Klien)
+      const bandDocRef = await addDoc(collection(db, "bands"), {
+        namaBand: formData.namaBand,
         noTelp: formData.noTelp,
-        alamat: formData.alamat,
-        jmlPersonil: formData.jmlPersonil,
-        note: formData.note,
-        service: selectedService.name,
-        date: selectedDate, 
-        time: cartSlots.map(s => s.time).join(", "),
-        price: totalPrice,
-        addons: cartAddons.map(a => a.name).join(", "),
-        status: "pending", // Artinya bayar di tempat
+        alamat: formData.alamat || "-",
+        kodeCabang: "PNL-01", 
+        namaPendaftar: formData.namaPendaftar,
+        jmlPersonil: formData.jmlPersonil || "-",
+        note: formData.note || "-"
+      });
+
+      // 2B. Simpan Data ke Tabel TRANSAKSI (Relasi pakai ID Band)
+      await addDoc(collection(db, "transaksi"), {
+        kodeCabang: "PNL-01",
+        tglMain: selectedDate,
+        jamMain: cartSlots.map(s => s.time).join(", "),
+        noTiket: ticketNo,
+        idBand: bandDocRef.id, 
+        namaBand: formData.namaBand,
+        noStudio: selectedService.name,
+        rpCash: 0,
+        rpTf: 0,
+        totalTagihan: totalPrice, // <--- TAMBAHKAN BARIS INI BRO!
+        statusTransaksi: "Menunggu Approval",
+        addAlat: cartAddons.length > 0 ? cartAddons.map(a => a.name).join(", ") : "Tidak",
+        note: formData.note || "-",
         createdAt: new Date().toISOString()
       });
       
@@ -251,7 +259,7 @@ export default function App() {
       msg += `*Jadwal Studio :*\nBuka Setiap Hari..\nJam : 09.00 sd 23.00\n*Mohon Datang Tepat Waktu*\n*Jam Akhir Booking : 21.00 *\n*Kami Tunggu di Studio..Yaa..* 🥳`;
       
       setTicketData({
-          bookingId,
+          bookingId: ticketNo,
           namaBand: formData.namaBand,
           service: selectedService.name,
           date: selectedDate,
@@ -262,7 +270,7 @@ export default function App() {
       // Buka WA
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
       
-      // Bersihkan Keranjang
+      // Bersihkan Keranjang & Form
       setCartSlots([]); setCartAddons([]);
       setFormData({namaBand: '', namaPendaftar: '', noTelp: '', alamat: '', jmlPersonil: '', note: ''});
 
@@ -517,6 +525,20 @@ export default function App() {
                         ))}
                       </div>
                   </div>
+
+                  {/* Sewa Alat Musik */}
+                  <div className="mt-6">
+                      <div className="text-[10px] font-black text-zinc-500 mb-3 uppercase tracking-widest pl-1">Sewa Alat (Rental)</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {SERVICES.filter(s => s.category === 'Sewa Alat Musik').map((srv) => (
+                          <button key={srv.id} onClick={() => { setSelectedService(srv); setCartSlots([]); }} className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all w-full text-left ${selectedService.id === srv.id ? 'bg-emerald-600/10 border-emerald-500' : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'}`}>
+                            <span className="text-2xl mb-2">{srv.icon}</span>
+                            <span className={`font-bold text-xs ${selectedService.id === srv.id ? 'text-white' : 'text-zinc-400'}`}>{srv.name}</span>
+                            <span className="text-emerald-500 font-black text-[10px] mt-1">Mulai {formatRupiah(srv.price)}/hari</span>
+                          </button>
+                        ))}
+                      </div>
+                  </div>
                 </div>
               </Reveal>
 
@@ -527,7 +549,7 @@ export default function App() {
                     2. Pilih Hari (Buka 09:00 - 23:00)
                   </h3>
                   <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x w-full">
-                    {[0, 1, 2, 3, 4, 5, 6].map((offset) => {
+                    {Array.from({ length: 14 }).map((_, offset) => {
                       const dateStr = getDateLabel(offset);
                       const d = new Date(); d.setDate(d.getDate() + offset);
                       const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
