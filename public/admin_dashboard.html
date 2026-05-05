@@ -273,7 +273,12 @@
 
                     <!-- Kanan: Tabel Inventaris -->
                     <div class="xl:col-span-2 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full min-h-[400px] flex flex-col">
-                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Daftar Perlengkapan Studio</h3>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 border-b border-zinc-800 pb-4 gap-4 w-full">
+                            <h3 class="text-white font-black uppercase text-sm">Daftar Perlengkapan Studio</h3>
+                            <button onclick="exportInventoryToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0 shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] transition-all active:scale-95">
+                                ⬇️ Download Data Alat (.CSV)
+                            </button>
+                        </div>
                         <div class="w-full overflow-x-auto custom-scroll flex-1">
                             <table class="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
                                 <thead>
@@ -525,7 +530,8 @@
         const historyBody = document.getElementById('history-table-body');
         let fullBookingDataForExcel = []; // Simpan data untuk Excel
 
-        onSnapshot(query(collection(db, "bookings"), orderBy("createdAt", "desc")), (snapshot) => {
+        // SATU-SATUNYA PENARIK DATA TRANSAKSI (MASTER)
+        onSnapshot(query(collection(db, "transaksi"), orderBy("createdAt", "desc")), (snapshot) => {
             pendingList.innerHTML = '';
             historyBody.innerHTML = '';
             fullBookingDataForExcel = []; // Reset
@@ -535,48 +541,66 @@
                 const data = docSnap.data();
                 fullBookingDataForExcel.push({id: docSnap.id, ...data});
 
-                const custName = data.customerName || "Tanpa Nama";
-                const bId = data.bookingId || docSnap.id.substring(0,6).toUpperCase();
+                // PENYESUAIAN KE NAMA KOLOM BARU KLIEN
+                const custName = data.namaBand || "Tanpa Nama";
+                const bId = data.noTiket || docSnap.id.substring(0,6).toUpperCase();
+                const tagihan = data.totalTagihan || data.rpCash || 0; 
                 
                 const dateObj = new Date(data.createdAt);
                 const timeStr = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth()+1).toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
                 
-                if (data.statusTransaksi === 'Menunggu Approval') {
+                // TAMPILKAN JIKA STATUSNYA PENDING ATAU ADA REQUEST UBAH/BATAL
+                if (data.statusTransaksi === 'Menunggu Approval' || data.statusTransaksi === 'Request Reschedule' || data.statusTransaksi === 'Request Batal') {
                     pendingCount++;
+                    
+                    let stripeColor = "bg-amber-500";
+                    let labelReq = "ORDER BARU";
+                    let btnKasirHTML = `<button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}', ${tagihan})">LUNAS (KASIR)</button>
+                                        <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}')">TOLAK / BATAL</button>`;
+
+                    if (data.statusTransaksi === 'Request Reschedule') {
+                        stripeColor = "bg-blue-500 animate-pulse";
+                        labelReq = "⚠️ REQ. UBAH JADWAL";
+                        btnKasirHTML = `<button class="w-full bg-blue-600 hover:bg-blue-500 text-white text-[9px] py-2.5 rounded-lg font-black tracking-widest transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}')">SETUJUI & KOSONGKAN JADWAL LAMA</button>`;
+                    } else if (data.statusTransaksi === 'Request Batal') {
+                        stripeColor = "bg-rose-500 animate-pulse";
+                        labelReq = "⚠️ REQ. BATAL TIKET";
+                        btnKasirHTML = `<button class="w-full bg-rose-600 hover:bg-rose-500 text-white text-[9px] py-2.5 rounded-lg font-black tracking-widest transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}')">SETUJUI & HAPUS TIKET</button>`;
+                    }
+
                     const item = document.createElement('div');
                     item.className = "bg-zinc-950 p-4 rounded-xl border border-zinc-800 shadow-md mb-3 relative overflow-hidden";
                     item.innerHTML = `
-                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                        <div class="absolute top-0 left-0 w-1 h-full ${stripeColor}"></div>
                         <div class="flex flex-col mb-3 pb-3 border-b border-zinc-800/50 pl-2">
                             <div class="flex justify-between items-start mb-1">
-                                <div class="text-white font-black text-sm uppercase pr-2 truncate">${custName}</div>
-                                <div class="text-emerald-400 font-black text-sm italic shrink-0">${formatRp(data.price)}</div>
+                                <div class="text-white font-black text-sm uppercase pr-2 truncate">${custName} <span class="text-[8px] ml-1 px-1.5 py-0.5 rounded ${stripeColor} text-white">${labelReq}</span></div>
+                                <div class="text-emerald-400 font-black text-sm italic shrink-0">${formatRp(tagihan)}</div>
                             </div>
-                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">${data.service} • Order: ${timeStr}</div>
+                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">Tiket: ${bId} • Order: ${timeStr}</div>
                         </div>
                         <div class="flex justify-between items-center bg-zinc-900 rounded-lg p-2 mb-3 border border-zinc-800/50 ml-2">
                              <div class="text-center flex-1 border-r border-zinc-800">
                                 <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Tgl Main</div>
-                                <div class="text-white text-[10px] md:text-xs font-bold">${data.date}</div>
+                                <div class="text-white text-[10px] md:text-xs font-bold">${data.tglMain}</div>
                              </div>
                              <div class="text-center flex-1">
                                 <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Jam</div>
-                                <div class="text-white text-[10px] md:text-xs font-bold">${data.time}</div>
+                                <div class="text-white text-[10px] md:text-xs font-bold">${data.jamMain}</div>
                              </div>
                         </div>
                         <div class="flex gap-2 ml-2">
-                            <button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.date}', '${data.time}')">LUNAS (KASIR)</button>
-                            <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.date}', '${data.time}')">BATALKAN</button>
+                            ${btnKasirHTML}
                         </div>
                     `;
                     pendingList.appendChild(item);
                 } 
                 else if (data.statusTransaksi === 'approved') {
-                    totalRevSemua += data.price; 
+                    totalRevSemua += data.rpCash; 
                     totalSesiLunas++;
 
-                    const dateIndex = last7Days.indexOf(data.date);
-                    if (dateIndex !== -1) chartData[dateIndex] += data.price;
+                    const dateIndex = last7Days.indexOf(data.tglMain);
+                    if (dateIndex !== -1) chartData[dateIndex] += data.rpCash;
                     
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-zinc-800/30 transition-colors group";
@@ -590,18 +614,17 @@
                             <div class="text-[9px] text-zinc-500">ID: ${data.idBand || '-'}</div>
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="text-xs font-bold text-zinc-300 truncate max-w-[150px]">${data.service}</div>
-                            <div class="text-[9px] text-emerald-500 font-bold mt-0.5">+ ${data.addons || 'Tidak Ada'}</div>
+                            <div class="text-xs font-bold text-zinc-300 truncate max-w-[150px]">${data.noStudio}</div>
+                            <div class="text-[9px] text-emerald-500 font-bold mt-0.5">+ ${data.addAlat || 'Tidak Ada'}</div>
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="text-xs font-bold text-white mb-0.5">${data.date}</div>
-                            <div class="text-amber-400 font-bold text-[10px]">${data.time}</div>
+                            <div class="text-xs font-bold text-white mb-0.5">${data.tglMain}</div>
+                            <div class="text-amber-400 font-bold text-[10px]">${data.jamMain}</div>
                         </td>
                         <td class="py-4 px-4 border-b border-zinc-800/30 max-w-[150px]">
-                            <div class="text-[9px] text-zinc-400 truncate">CP: ${data.namaPendaftar || '-'} (${data.noTelp || '-'})</div>
-                            <div class="text-[9px] text-zinc-400 truncate">Ket: ${data.note || '-'}</div>
+                            <div class="text-[9px] text-zinc-400 truncate">Note: ${data.note || '-'}</div>
                         </td>
-                        <td class="py-4 px-4 text-right font-black italic text-emerald-400 text-sm border-b border-zinc-800/30">${formatRp(data.price)}</td>
+                        <td class="py-4 px-4 text-right font-black italic text-emerald-400 text-sm border-b border-zinc-800/30">${formatRp(data.rpCash)}</td>
                     `;
                     historyBody.appendChild(tr);
                 }
@@ -758,99 +781,73 @@
             await deleteDoc(doc(db, "inventory", id));
         };
 
-        onSnapshot(query(collection(db, "transaksi"), orderBy("createdAt", "desc")), (snapshot) => {
-            pendingList.innerHTML = '';
-            historyBody.innerHTML = '';
-            fullBookingDataForExcel = []; // Reset
-            let pendingCount = 0; let totalRevSemua = 0; let totalSesiLunas = 0; let chartData = [0, 0, 0, 0, 0, 0, 0]; 
+        let fullInventoryDataForExcel = []; // Variabel penampung data Excel
 
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                fullBookingDataForExcel.push({id: docSnap.id, ...data});
+        window.exportInventoryToExcel = () => {
+            if (fullInventoryDataForExcel.length === 0) return alert("Belum ada data inventaris!");
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "No. Studio,Kategori,Nama Alat,Serial Number (SN),Status Alat,Tgl Beli,Harga Beli,Nama Toko,No Kontak Toko,Catatan\n";
 
-                // PENYESUAIAN KE NAMA KOLOM BARU KLIEN
-                const custName = data.namaBand || "Tanpa Nama";
-                const bId = data.noTiket || docSnap.id.substring(0,6).toUpperCase();
-                const tagihan = data.totalTagihan || data.rpCash || 0; // Ambil nominal harga
+            fullInventoryDataForExcel.forEach(d => {
+                const note = d.noted ? String(d.noted).replace(/,/g, " ") : "-";
+                const namaToko = d.namatoko ? String(d.namatoko).replace(/,/g, " ") : "-";
+                const nama = d.nama ? String(d.nama).replace(/,/g, " ") : "-";
                 
-                const dateObj = new Date(data.createdAt);
-                const timeStr = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth()+1).toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
-                
-                if (data.statusTransaksi === 'Menunggu Approval') {
-                    pendingCount++;
-                    const item = document.createElement('div');
-                    item.className = "bg-zinc-950 p-4 rounded-xl border border-zinc-800 shadow-md mb-3 relative overflow-hidden";
-                    item.innerHTML = `
-                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                        <div class="flex flex-col mb-3 pb-3 border-b border-zinc-800/50 pl-2">
-                            <div class="flex justify-between items-start mb-1">
-                                <div class="text-white font-black text-sm uppercase pr-2 truncate">${custName}</div>
-                                <div class="text-emerald-400 font-black text-sm italic shrink-0">${formatRp(tagihan)}</div>
-                            </div>
-                            <div class="text-zinc-500 text-[9px] font-bold tracking-widest uppercase">${data.noStudio} • Order: ${timeStr}</div>
-                        </div>
-                        <div class="flex justify-between items-center bg-zinc-900 rounded-lg p-2 mb-3 border border-zinc-800/50 ml-2">
-                             <div class="text-center flex-1 border-r border-zinc-800">
-                                <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Tgl Main</div>
-                                <div class="text-white text-[10px] md:text-xs font-bold">${data.tglMain}</div>
-                             </div>
-                             <div class="text-center flex-1">
-                                <div class="text-zinc-500 text-[8px] uppercase tracking-widest font-black mb-0.5">Jam</div>
-                                <div class="text-white text-[10px] md:text-xs font-bold">${data.jamMain}</div>
-                             </div>
-                        </div>
-                        <div class="flex gap-2 ml-2">
-                            <button class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] md:text-[10px] py-2.5 md:py-3 rounded-lg font-black tracking-widest transition-colors shadow-lg shadow-emerald-900/20" onclick="approveBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}', ${tagihan})">LUNAS (KASIR)</button>
-                            <button class="bg-transparent hover:bg-rose-900/20 border border-zinc-700 hover:border-rose-500 text-rose-500 text-[9px] md:text-[10px] px-3 md:px-4 py-2.5 md:py-3 rounded-lg font-black transition-colors" onclick="rejectBooking('${docSnap.id}', '${data.tglMain}', '${data.jamMain}')">BATALKAN</button>
-                        </div>
-                    `;
-                    pendingList.appendChild(item);
-                } 
-                else if (data.statusTransaksi === 'approved') {
-                    totalRevSemua += data.rpCash; 
-                    totalSesiLunas++;
-
-                    const dateIndex = last7Days.indexOf(data.tglMain);
-                    if (dateIndex !== -1) chartData[dateIndex] += data.rpCash;
-                    
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-zinc-800/30 transition-colors group";
-                    tr.innerHTML = `
-                        <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="text-[10px] font-mono text-zinc-400 mb-0.5">${bId}</div>
-                            <div class="text-[9px] font-bold text-zinc-500 tracking-wider">${timeStr}</div>
-                        </td>
-                        <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="font-black text-white text-xs mb-0.5">${custName}</div>
-                            <div class="text-[9px] text-zinc-500">ID: ${data.idBand || '-'}</div>
-                        </td>
-                        <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="text-xs font-bold text-zinc-300 truncate max-w-[150px]">${data.noStudio}</div>
-                            <div class="text-[9px] text-emerald-500 font-bold mt-0.5">+ ${data.addAlat || 'Tidak Ada'}</div>
-                        </td>
-                        <td class="py-4 px-4 border-b border-zinc-800/30">
-                            <div class="text-xs font-bold text-white mb-0.5">${data.tglMain}</div>
-                            <div class="text-amber-400 font-bold text-[10px]">${data.jamMain}</div>
-                        </td>
-                        <td class="py-4 px-4 border-b border-zinc-800/30 max-w-[150px]">
-                            <div class="text-[9px] text-zinc-400 truncate">Note: ${data.note || '-'}</div>
-                        </td>
-                        <td class="py-4 px-4 text-right font-black italic text-emerald-400 text-sm border-b border-zinc-800/30">${formatRp(data.rpCash)}</td>
-                    `;
-                    historyBody.appendChild(tr);
-                }
+                const row = [
+                    d.noStudio || "-",
+                    d.kategori || "-",
+                    `"${nama}"`,
+                    d.sn || "-",
+                    d.statusAlat || "-",
+                    d.tglbeli || "-",
+                    d.hargabeli || 0,
+                    `"${namaToko}"`,
+                    d.kontaktoko || "-",
+                    `"${note}"`
+                ];
+                csvContent += row.join(",") + "\n";
             });
 
-            if (pendingCount === 0) pendingList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-zinc-600 min-h-[200px]"><span class="text-3xl mb-2 opacity-50">☕</span><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Tidak Ada Antrean Kasir</p></div>`;
-            if (totalRevSemua === 0) historyBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Belum ada transaksi sukses.</td></tr>`;
-            
-            document.getElementById('kpi-pending').innerText = `${pendingCount} Antrean`;
-            document.getElementById('kpi-revenue').innerText = formatRp(totalRevSemua);
-            document.getElementById('kpi-bookings').innerText = `${totalSesiLunas} Sesi`;
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Data_Inventaris_PanelMusic_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
 
-            revenueChartInstance.data.labels = dayLabels;
-            revenueChartInstance.data.datasets[0].data = chartData;
-            revenueChartInstance.update();
+        // --- PENARIK DATA INVENTARIS (YANG SEMPAT HILANG) ---
+        onSnapshot(query(collection(db, "inventory"), orderBy("createdAt", "desc")), (snapshot) => {
+            const invList = document.getElementById('inventory-list');
+            invList.innerHTML = '';
+            fullInventoryDataForExcel = [];
+            if(snapshot.empty) {
+                invList.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-zinc-600 text-xs">Belum ada alat yang dicatat.</td></tr>`;
+                return;
+            }
+            
+            snapshot.forEach((docSnap) => {
+                const d = docSnap.data();
+                fullInventoryDataForExcel.push({id: docSnap.id, ...d});
+
+                const dataStr = encodeURIComponent(JSON.stringify(d));
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-zinc-800/30 transition-colors";
+                
+                tr.innerHTML = `
+                    <td class="py-3 px-3 border-b border-zinc-800/30"><span class="bg-zinc-800 text-zinc-300 px-2 py-1 rounded text-[10px] uppercase font-bold">${d.noStudio || d.lokasi || '-'}</span></td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 font-bold text-white">${d.nama} <span class="text-emerald-500 ml-1 text-[10px]">(${d.sn || d.merk || '-'})</span></td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-xs ${d.statusAlat === 'Rusak' ? 'text-rose-500' : 'text-amber-400'} font-bold">${d.statusAlat || d.kondisi || 'Tersedia'}</td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-[10px] text-zinc-400">${d.tglbeli || '-'} <br/> ${d.hargabeli ? formatRp(d.hargabeli) : (d.infoBeli || '-')}</td>
+                    <td class="py-3 px-3 border-b border-zinc-800/30 text-right space-x-2">
+                        <button onclick="editInventory('${docSnap.id}', '${dataStr}')" class="text-emerald-500 hover:text-emerald-400 text-[10px] font-black uppercase underline">Edit</button>
+                        <button onclick="deleteInventory('${docSnap.id}')" class="text-rose-500 hover:text-rose-400 text-[10px] font-black uppercase underline">Hapus</button>
+                    </td>
+                `;
+                invList.appendChild(tr);
+            });
         });
 
         // --- AKSI TERIMA(LUNAS)/TOLAK ---

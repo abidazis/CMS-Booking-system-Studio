@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { initializeApp } from 'firebase/app';
-import { initializeFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, orderBy, writeBatch } from 'firebase/firestore';
-
+import { initializeFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, orderBy, writeBatch, getDocs, where } from 'firebase/firestore';
 // ======================================================================
 // 🚀 CONFIG FIREBASE PANEL MUSIC (Tetap pakai yg lama gak masalah)
 // ======================================================================
@@ -90,6 +89,42 @@ export default function App() {
   const [toast, setToast] = useState(null); 
   const [inventoryData, setInventoryData] = useState([]);
 
+  // --- FITUR CEK & UBAH TIKET ---
+  const [isCheckTicketOpen, setIsCheckTicketOpen] = useState(false);
+  const [searchTicketId, setSearchTicketId] = useState('');
+  const [foundTicket, setFoundTicket] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearchTicket = async () => {
+    if(!searchTicketId) return;
+    setIsSearching(true);
+    try {
+      const q = query(collection(db, "transaksi"), where("noTiket", "==", searchTicketId));
+      const querySnapshot = await getDocs(q);
+      if(!querySnapshot.empty) {
+        const docSnap = querySnapshot.docs[0];
+        setFoundTicket({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        showToast("Tiket tidak ditemukan! Cek lagi nomornya.", "error");
+        setFoundTicket(null);
+      }
+    } catch (e) { showToast("Gagal mencari tiket", "error"); }
+    setIsSearching(false);
+  };
+
+  const handleRequestChange = async (type) => {
+    if(!foundTicket) return;
+    const confirmMsg = type === 'Batal' ? 'Yakin ingin membatalkan jadwal ini?' : 'Yakin ingin mengajukan perubahan jadwal? (Admin akan menghubungi Anda via WA)';
+    if(!window.confirm(confirmMsg)) return;
+
+    try {
+      const statusReq = type === 'Batal' ? 'Request Batal' : 'Request Reschedule';
+      await updateDoc(doc(db, "transaksi", foundTicket.id), { statusTransaksi: statusReq });
+      showToast(`Pengajuan ${type} berhasil dikirim ke Admin!`, "success");
+      setFoundTicket({...foundTicket, statusTransaksi: statusReq});
+    } catch (e) { showToast("Gagal mengirim pengajuan", "error"); }
+  };
+  
   const showToast = (message, type = 'info') => {
     setToast({ message, type }); setTimeout(() => setToast(null), 4000);
   };
@@ -354,6 +389,46 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL CEK / UBAH TIKET */}
+      {isCheckTicketOpen && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-zinc-900 rounded-3xl w-full max-w-md p-6 border border-zinc-700 shadow-2xl relative flex flex-col">
+            <button onClick={() => setIsCheckTicketOpen(false)} className="absolute top-4 right-4 text-zinc-500 hover:text-white"><Icons.X /></button>
+            <h3 className="text-white font-black text-xl mb-1">Cek Tiket Reservasi</h3>
+            <p className="text-zinc-400 text-[10px] uppercase tracking-widest mb-6">Ajukan ubah jadwal atau batal</p>
+            
+            <div className="flex gap-2 mb-4">
+              <input type="text" value={searchTicketId} onChange={(e) => setSearchTicketId(e.target.value)} placeholder="No Tiket (Cth: 2026-123)" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white font-bold outline-none focus:border-emerald-500" />
+              <button onClick={handleSearchTicket} disabled={isSearching} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-5 rounded-xl uppercase text-[10px] tracking-widest">
+                {isSearching ? 'Cari...' : 'Cari'}
+              </button>
+            </div>
+
+            {foundTicket && (
+              <div className="bg-[#111113] p-4 rounded-xl border border-zinc-800 space-y-3 mt-2">
+                <div className="flex justify-between border-b border-zinc-800/50 pb-2">
+                   <span className="text-zinc-500 text-[10px] uppercase font-bold">Status</span>
+                   <span className={`text-[10px] font-black uppercase ${foundTicket.statusTransaksi.includes('Request') ? 'text-amber-500' : 'text-emerald-400'}`}>{foundTicket.statusTransaksi}</span>
+                </div>
+                <div><p className="text-zinc-500 text-[9px] uppercase font-bold">Band</p><p className="text-white font-black text-sm">{foundTicket.namaBand}</p></div>
+                <div><p className="text-zinc-500 text-[9px] uppercase font-bold">Jadwal</p><p className="text-white font-bold text-xs">{foundTicket.tglMain} ({foundTicket.jamMain})</p></div>
+                
+                {/* Tombol Aksi cuma muncul kalau belum di-approve kasir / belum di-request */}
+                {foundTicket.statusTransaksi === 'Menunggu Approval' && (
+                  <div className="grid grid-cols-2 gap-2 pt-3 mt-3 border-t border-zinc-800">
+                    <button onClick={() => handleRequestChange('Reschedule')} className="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 font-black py-2 rounded-lg text-[9px] uppercase tracking-widest transition-all">Reschedule</button>
+                    <button onClick={() => handleRequestChange('Batal')} className="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/30 font-black py-2 rounded-lg text-[9px] uppercase tracking-widest transition-all">Batalkan</button>
+                  </div>
+                )}
+                {foundTicket.statusTransaksi.includes('Request') && (
+                  <p className="text-amber-500 text-[9px] text-center italic mt-2">Pengajuan sedang direview oleh Admin. Mohon tunggu konfirmasi via WA.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* NAVBAR */}
       <nav className={`fixed w-full z-[150] transition-all duration-500 ${scrolled ? 'bg-[#111113]/95 backdrop-blur-xl border-b border-zinc-800 py-3 shadow-2xl' : 'bg-gradient-to-b from-[#111113]/90 to-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-5 md:px-6 flex justify-between items-center">
@@ -362,6 +437,10 @@ export default function App() {
           </div>
           <div className="hidden md:flex gap-8 text-xs font-bold tracking-[0.2em] uppercase text-zinc-400">
             <button onClick={() => scrollTo('home')} className="hover:text-white transition">Beranda</button>
+            {/* TAMBAHAN MENU CEK TIKET */}
+            <button onClick={() => {setIsCheckTicketOpen(true); setFoundTicket(null); setSearchTicketId('');}} className="text-amber-400 hover:text-amber-300 transition flex items-center gap-2">
+              🎫 Cek / Ubah Tiket
+            </button>
             <button onClick={() => scrollTo('booking')} className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Booking
             </button>
@@ -426,8 +505,8 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
                 {inventoryData.map((item) => {
                   // LOGIKA JALUR NINJA: Foto Otomatis Berdasarkan Nama Alat!
-                  let autoImage = "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=600"; // Default Studio
-                  const n = item.nama.toLowerCase();
+                  let autoImage = "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=600"; 
+                  const n = item.nama ? item.nama.toLowerCase() : '';
                   if(n.includes('drum')) autoImage = "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&q=80&w=600";
                   else if(n.includes('gitar') || n.includes('guitar')) autoImage = "https://images.unsplash.com/photo-1511335513650-807809322b5e?auto=format&fit=crop&q=80&w=600";
                   else if(n.includes('bass')) autoImage = "https://images.unsplash.com/photo-1512684051462-9d50fb229fed?auto=format&fit=crop&q=80&w=600";
@@ -435,8 +514,9 @@ export default function App() {
                   else if(n.includes('ampli') || n.includes('head')) autoImage = "https://images.unsplash.com/photo-1563330232-57114bb0823c?auto=format&fit=crop&q=80&w=600";
                   else if(n.includes('cymbal') || n.includes('simbal')) autoImage = "https://images.unsplash.com/photo-1591604122177-802af0d0c3eb?auto=format&fit=crop&q=80&w=600";
 
-                  // Jika admin ngisi link foto sendiri, pakai link admin. Kalau kosong, pakai foto otomatis.
-                  const finalImage = item.imageUrl || autoImage;
+                  // Filter Pencegah Gambar Pecah: Pastikan imageUrl adalah link http asli
+                  const hasValidUrl = item.imageUrl && item.imageUrl.startsWith('http');
+                  const finalImage = hasValidUrl ? item.imageUrl : autoImage;
 
                   return (
                     <div key={item.id} className="bg-zinc-900/40 rounded-2xl border border-zinc-800 flex flex-col hover:border-emerald-500/50 transition-all duration-300 overflow-hidden group hover:shadow-[0_10px_30px_-15px_rgba(16,185,129,0.3)]">
@@ -445,7 +525,7 @@ export default function App() {
                       <div className="w-full h-40 md:h-48 overflow-hidden relative">
                          <img src={finalImage} alt={item.nama} className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
                          <div className="absolute top-3 right-3 bg-zinc-950/80 backdrop-blur-md text-zinc-300 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black border border-zinc-800 shadow-xl">
-                            {item.lokasi}
+                            {item.noStudio || item.lokasi}
                          </div>
                       </div>
                       
@@ -454,12 +534,14 @@ export default function App() {
                         <div>
                           <h4 className="text-white font-black text-lg md:text-xl leading-tight mb-4">{item.nama}</h4>
                           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-500 mb-2 border-b border-zinc-800/50 pb-2">
-                             <span>Merk/Brand</span>
-                             <span className="text-emerald-400 text-right">{item.merk}</span>
+                             <span>SN / Merk</span>
+                             <span className="text-emerald-400 text-right">{item.sn || item.merk || '-'}</span>
                           </div>
                           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-                             <span>Kondisi Alat</span>
-                             <span className="text-zinc-300 text-right">{item.kondisi}</span>
+                             <span>Status Alat</span>
+                             <span className={`font-black text-right ${item.statusAlat === 'Rusak' ? 'text-rose-500' : 'text-zinc-300'}`}>
+                                 {item.statusAlat || item.kondisi || 'Tersedia'}
+                             </span>
                           </div>
                         </div>
                       </div>
