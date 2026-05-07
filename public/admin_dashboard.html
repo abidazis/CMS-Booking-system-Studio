@@ -58,6 +58,9 @@
             <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
                 🎸 Data Inventaris
             </button>
+            <button onclick="switchTab('services')" id="nav-services" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
+                🛒 Kelola Layanan & Harga
+            </button>
         </nav>
         
         <div class="p-4 border-t border-zinc-800">
@@ -85,6 +88,9 @@
             </button>
             <button onclick="switchTab('inventory'); toggleMobileMenu()" id="mob-nav-inventory" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
                 🎸 Data Inventaris
+            </button>
+            <button onclick="switchTab('services'); toggleMobileMenu()" id="mob-nav-services" class="w-full flex items-center gap-3 hover:bg-zinc-900 text-zinc-400 px-4 py-3 rounded-2xl font-bold text-sm border border-transparent transition-all">
+                🛒 Kelola Layanan & Harga
             </button>
         </nav>
         <div class="p-4 border-t border-zinc-800">
@@ -259,8 +265,12 @@
                                 <input type="text" id="inv-noted" placeholder="Catatan alat..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">URL Foto (Opsional)</label>
-                                <input type="text" id="inv-image" placeholder="Link gambar dari Web / Kosongkan" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Upload Foto Alat (Opsional)</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="file" id="inv-image-file" accept="image/*" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-400 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer outline-none transition-all">
+                                </div>
+                                <input type="hidden" id="inv-image-url" value=""> <!-- Penampung rahasia untuk URL gambar -->
+                                <p id="inv-image-preview-text" class="text-[9px] text-emerald-500 mt-1 italic hidden">Ada gambar tersimpan</p>
                             </div>
                             <div class="flex gap-2 mt-2">
                                 <button onclick="resetInvForm()" type="button" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-widest text-[10px] px-4 py-4 rounded-xl transition-all">Batal</button>
@@ -309,7 +319,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { initializeFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, query, orderBy, getDocs, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
         // --- CONFIG FIREBASE PANEL MUSIC ---
         const firebaseConfig = {
         apiKey: "AIzaSyAkXmReTZmz7xCO_GnRTfQ-xhXc-5WIy1E",
@@ -323,6 +334,7 @@
         const app = initializeApp(firebaseConfig);
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
         const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        const storage = getStorage(app);
 
         // --- SISTEM LOGIN ---
         const PIN_RAHASIA = "123456"; 
@@ -711,6 +723,7 @@
             document.body.removeChild(link);
         };
         // --- FITUR INVENTARIS STUDIO (LENGKAP 12 KOLOM + EDIT + HAPUS) ---
+        // --- FITUR INVENTARIS STUDIO (DENGAN UPLOAD FOTO IMGBB) ---
         window.resetInvForm = () => {
             document.getElementById('inv-id').value = '';
             document.getElementById('form-inv-title').innerText = 'Tambah Inventaris';
@@ -725,11 +738,19 @@
             document.getElementById('inv-namatoko').value = '';
             document.getElementById('inv-kontaktoko').value = '';
             document.getElementById('inv-noted').value = '';
-            document.getElementById('inv-image').value = '';
+            
+            document.getElementById('inv-image-file').value = ''; // Kosongin file
+            document.getElementById('inv-image-url').value = ''; // Kosongin rahasia
+            document.getElementById('inv-image-preview-text').classList.add('hidden');
         };
 
         window.saveInventory = async () => {
             const id = document.getElementById('inv-id').value;
+            const btnSave = document.getElementById('btn-save-inv');
+            const fileInput = document.getElementById('inv-image-file');
+            const file = fileInput.files[0];
+            let finalImageUrl = document.getElementById('inv-image-url').value; 
+
             const data = {
                 noStudio: document.getElementById('inv-nostudio').value,
                 kategori: document.getElementById('inv-kategori').value,
@@ -741,23 +762,66 @@
                 namatoko: document.getElementById('inv-namatoko').value,
                 kontaktoko: document.getElementById('inv-kontaktoko').value,
                 noted: document.getElementById('inv-noted').value,
-                imageUrl: document.getElementById('inv-image').value,
                 kodeCabang: "PNL-01"
             };
 
             if(!data.nama || !data.kategori) return alert("Nama alat dan Kategori wajib diisi!");
 
-            if (id) {
-                await updateDoc(doc(db, "inventory", id), data);
-                alert("Data alat berhasil diupdate!");
-            } else {
-                data.createdAt = new Date().toISOString();
-                await addDoc(collection(db, "inventory"), data);
-                alert("Data alat berhasil disimpan!");
-            }
-            resetInvForm();
-        };
+            btnSave.innerText = "⏳ Sedang Menyimpan...";
+            btnSave.disabled = true;
+            btnSave.classList.add('opacity-50', 'cursor-not-allowed');
 
+            try {
+                // JIKA ADMIN PILIH FILE FOTO BARU, UPLOAD KE CLOUDINARY
+                if (file) {
+                    btnSave.innerText = "⏳ Uploading Foto ke Cloudinary...";
+                    
+                    const formData = new FormData();
+                    // Cloudinary bisa langsung menerima objek file mentah (tidak perlu diubah ke Base64)
+                    formData.append('file', file);
+                    // Masukkan nama preset yang sudah kamu buat tadi
+                    formData.append('upload_preset', 'panelmusic_preset'); 
+
+                    // ⚠️ PENTING: GANTI TEKS DI BAWAH INI DENGAN CLOUD NAME KAMU!
+                    // (Cloud name bisa dilihat di Dashboard utama Cloudinary, di pojok kiri atas atau menu Programmable Media)
+                    const cloudName = 'dotz14hya'; 
+                    
+                    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const cloudinaryResult = await response.json();
+
+                    if (response.ok) {
+                        // Langsung ambil URL HTTPS yang anti-blokir dari Cloudinary
+                        finalImageUrl = cloudinaryResult.secure_url; 
+                    } else {
+                        throw new Error(cloudinaryResult.error.message || "Gagal upload gambar ke Cloudinary");
+                    }
+                }
+
+                data.imageUrl = finalImageUrl; // Gabung URL ke data
+
+                if (id) {
+                    await updateDoc(doc(db, "inventory", id), data);
+                    alert("Data alat & foto berhasil diupdate!");
+                } else {
+                    data.createdAt = new Date().toISOString();
+                    await addDoc(collection(db, "inventory"), data);
+                    alert("Data alat & foto berhasil disimpan!");
+                }
+                resetInvForm();
+            } catch (e) {
+                console.error("Error Detail Lengkap:", e);
+                alert("Gagal Menyimpan Data! Error detail: " + e.message);
+            } finally {
+                btnSave.innerText = "Simpan Data Alat";
+                btnSave.disabled = false;
+                btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+        
         window.editInventory = (id, dataStr) => {
             const d = JSON.parse(decodeURIComponent(dataStr));
             document.getElementById('inv-id').value = id;
@@ -773,12 +837,31 @@
             document.getElementById('inv-namatoko').value = d.namatoko || '';
             document.getElementById('inv-kontaktoko').value = d.kontaktoko || '';
             document.getElementById('inv-noted').value = d.noted || '';
-            document.getElementById('inv-image').value = d.imageUrl || '';
+            
+            document.getElementById('inv-image-file').value = ''; 
+            document.getElementById('inv-image-url').value = d.imageUrl || ''; // Simpan URL lama diam-diam
+            
+            const prevText = document.getElementById('inv-image-preview-text');
+            if(d.imageUrl) {
+                prevText.classList.remove('hidden');
+                prevText.innerText = '✅ Ada gambar tersimpan. Biarkan kosong jika tidak ingin ganti foto.';
+            } else {
+                prevText.classList.add('hidden');
+            }
         };
 
         window.deleteInventory = async (id) => {
             if(!confirm("Hapus alat ini dari daftar inventaris?")) return;
-            await deleteDoc(doc(db, "inventory", id));
+            
+            // Catatan: ImgBB tidak mendukung penghapusan gambar via API publik dengan mudah.
+            // Biasanya gambar dibiarkan saja di server mereka, dan kita cukup hapus datanya di database kita (Firestore).
+            try {
+                await deleteDoc(doc(db, "inventory", id));
+                alert("Data inventaris berhasil dihapus!");
+            } catch(e) {
+                console.error(e);
+                alert("Gagal menghapus data!");
+            }
         };
 
         let fullInventoryDataForExcel = []; // Variabel penampung data Excel
