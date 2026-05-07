@@ -315,6 +315,27 @@ export default function App() {
     setIsProcessing(false);
   };
 
+  // State untuk menampung data dinamis dari Firebase, gunakan array jadul sebagai cadangan jika koneksi lambat
+  const [dynamicServices, setDynamicServices] = useState(SERVICES); 
+  const [dynamicAddons, setDynamicAddons] = useState(ADDONS);
+
+  // Ambil Data Master Layanan & Addon dari Database
+  useEffect(() => {
+    if (!db) return;
+    const unsubSrv = onSnapshot(collection(db, "services"), (snap) => {
+        if(!snap.empty) {
+           const data = snap.docs.map(doc => ({ dbId: doc.id, ...doc.data() }));
+           setDynamicServices(data);
+           // Update selectedService otomatis jika ada perubahan
+           setSelectedService(prev => data.find(s => s.id === prev.id) || data[0]); 
+        }
+    });
+    const unsubAdd = onSnapshot(collection(db, "addons"), (snap) => {
+        if(!snap.empty) setDynamicAddons(snap.docs.map(doc => ({ dbId: doc.id, ...doc.data() })));
+    });
+    return () => { unsubSrv(); unsubAdd(); };
+  }, []);
+
   return (
     <div className="bg-[#111113] text-zinc-300 font-sans min-h-screen selection:bg-emerald-500/30 pb-32 xl:pb-0 overflow-x-hidden max-w-[100vw] flex flex-col relative">
       
@@ -573,6 +594,7 @@ export default function App() {
             <div className="xl:col-span-2 space-y-6 md:space-y-8 w-full min-w-0">
               
               {/* 1. Service Selector (DIPISAH REHEARSAL & RECORDING) */}
+              {/* 1. Service Selector (DIPISAH REHEARSAL & RECORDING) */}
               <Reveal delay={100}>
                 <div className="bg-zinc-900/80 p-5 md:p-8 rounded-2xl md:rounded-[2rem] border border-zinc-800 shadow-xl w-full box-border">
                   <h3 className="text-white font-black mb-6 uppercase tracking-widest text-[10px] border-b border-zinc-800 pb-4">
@@ -583,7 +605,7 @@ export default function App() {
                   <div className="mb-6">
                       <div className="text-[10px] font-black text-zinc-500 mb-3 uppercase tracking-widest pl-1">Rehearsal (Latihan)</div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {SERVICES.filter(s => s.category === 'Rehearsal').map((srv) => (
+                        {dynamicServices.filter(s => s.category === 'Rehearsal').map((srv) => (
                           <button key={srv.id} onClick={() => { setSelectedService(srv); setCartSlots([]); }} className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all w-full text-left ${selectedService.id === srv.id ? 'bg-emerald-600/10 border-emerald-500' : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'}`}>
                             <span className="text-2xl mb-2">{srv.icon}</span>
                             <span className={`font-bold text-xs ${selectedService.id === srv.id ? 'text-white' : 'text-zinc-400'}`}>{srv.name}</span>
@@ -597,7 +619,7 @@ export default function App() {
                   <div>
                       <div className="text-[10px] font-black text-zinc-500 mb-3 uppercase tracking-widest pl-1">Recording Session</div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {SERVICES.filter(s => s.category === 'Recording').map((srv) => (
+                        {dynamicServices.filter(s => s.category === 'Recording').map((srv) => (
                           <button key={srv.id} onClick={() => { setSelectedService(srv); setCartSlots([]); }} className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all w-full text-left ${selectedService.id === srv.id ? 'bg-emerald-600/10 border-emerald-500' : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'}`}>
                             <span className="text-xl mb-2">{srv.icon}</span>
                             <span className={`font-black text-xs md:text-sm leading-tight ${selectedService.id === srv.id ? 'text-white' : 'text-zinc-300'}`}>{srv.name}</span>
@@ -612,7 +634,7 @@ export default function App() {
                   <div className="mt-6">
                       <div className="text-[10px] font-black text-zinc-500 mb-3 uppercase tracking-widest pl-1">Sewa Alat (Rental)</div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {SERVICES.filter(s => s.category === 'Sewa Alat Musik').map((srv) => (
+                        {dynamicServices.filter(s => s.category === 'Sewa Alat Musik').map((srv) => (
                           <button key={srv.id} onClick={() => { setSelectedService(srv); setCartSlots([]); }} className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all w-full text-left ${selectedService.id === srv.id ? 'bg-emerald-600/10 border-emerald-500' : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700'}`}>
                             <span className="text-2xl mb-2">{srv.icon}</span>
                             <span className={`font-bold text-xs ${selectedService.id === srv.id ? 'text-white' : 'text-zinc-400'}`}>{srv.name}</span>
@@ -705,13 +727,18 @@ export default function App() {
                 <div className="bg-zinc-900/80 p-5 md:p-8 rounded-2xl md:rounded-[2rem] border border-zinc-800 shadow-xl w-full">
                   <h3 className="text-white font-black mb-4 uppercase tracking-widest text-[10px] border-b border-zinc-800 pb-4">4. Tambah Alat (Opsional)</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-                    {ADDONS.map((addon) => {
-                      const isSelected = cartAddons.find(a => a.id === addon.id);
+                    {dynamicAddons.map((addon, index) => {
+                      // JURUS NINJA: Pastikan setiap addon punya ID yang mutlak dari Firebase
+                      const uniqueId = addon.dbId || addon.id || `addon-${index}`;
+                      const safeAddon = { ...addon, id: uniqueId }; // Sinkronisasi ID biar toggleAddon gak bingung
+                      
+                      const isSelected = cartAddons.find(a => a.id === uniqueId);
+                      
                       return (
-                        <button key={addon.id} onClick={() => toggleAddon(addon)} className={`flex justify-between items-center p-4 rounded-xl border-2 transition-all ${isSelected ? 'bg-zinc-800 border-emerald-500' : 'bg-zinc-950 border-zinc-800'}`}>
+                        <button key={uniqueId} onClick={() => toggleAddon(safeAddon)} className={`flex justify-between items-center p-4 rounded-xl border-2 transition-all ${isSelected ? 'bg-zinc-800 border-emerald-500' : 'bg-zinc-950 border-zinc-800'}`}>
                           <div className="flex-1 pr-2 text-left">
-                            <div className={`font-bold text-xs ${isSelected ? 'text-white' : 'text-zinc-400'}`}>{addon.name}</div>
-                            <div className="text-emerald-400 text-[9px] font-black tracking-widest uppercase mt-1">+{formatRupiah(addon.price)}</div>
+                            <div className={`font-bold text-xs ${isSelected ? 'text-white' : 'text-zinc-400'}`}>{safeAddon.name}</div>
+                            <div className="text-emerald-400 text-[9px] font-black tracking-widest uppercase mt-1">+{formatRupiah(safeAddon.price)}</div>
                           </div>
                           <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-zinc-700 text-transparent'}`}><Icons.Check className="w-3 h-3" /></div>
                         </button>

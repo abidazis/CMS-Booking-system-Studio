@@ -310,6 +310,51 @@
                 </div>
             </div>
 
+            <div id="tab-services" class="tab-content w-full min-w-0">
+                <div class="grid xl:grid-cols-2 gap-6 w-full min-w-0">
+                    
+                    <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full flex flex-col min-h-[400px]">
+                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Manajemen Layanan Utama</h3>
+                        <input type="hidden" id="srv-id">
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <input type="text" id="srv-name" placeholder="Nama (Cth: Studio 1)" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            <select id="srv-cat" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                                <option value="Rehearsal">Rehearsal (Latihan)</option>
+                                <option value="Recording">Recording</option>
+                                <option value="Sewa Alat Musik">Sewa Alat Keluar</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <input type="number" id="srv-price" placeholder="Harga (Cth: 50000)" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            <input type="text" id="srv-icon" placeholder="Emoji (Cth: 🎸)" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="saveService()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 mb-6">Simpan Layanan</button>
+                        
+                        <div class="overflow-y-auto custom-scroll flex-1 pr-2">
+                            <table class="w-full text-left text-xs text-zinc-300">
+                                <tbody id="service-list" class="divide-y divide-zinc-800/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full flex flex-col min-h-[400px]">
+                        <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5">Manajemen Add-On Alat</h3>
+                        <input type="hidden" id="add-id">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <input type="text" id="add-name" placeholder="Nama Alat (Cth: Double Pedal)" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                            <input type="number" id="add-price" placeholder="Harga Sewa (Cth: 20000)" class="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="saveAddon()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 mb-6">Simpan Add-On</button>
+                        
+                        <div class="overflow-y-auto custom-scroll flex-1 pr-2">
+                            <table class="w-full text-left text-xs text-zinc-300">
+                                <tbody id="addon-list" class="divide-y divide-zinc-800/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
         </div>
     </main>
 
@@ -396,9 +441,12 @@
             } else if (tabName === 'history') {
                 document.getElementById('header-title').innerText = "Riwayat Transaksi";
                 document.getElementById('header-subtitle').innerText = "Data Penjualan Lunas";
-            } else {
+            } else if (tabName === 'inventory') {
                 document.getElementById('header-title').innerText = "Inventaris Aset";
                 document.getElementById('header-subtitle').innerText = "Data Perlengkapan Studio";
+            } else {
+                document.getElementById('header-title').innerText = "Kelola Layanan";
+                document.getElementById('header-subtitle').innerText = "Master Data Harga & Addon";
             }
         };
 
@@ -962,6 +1010,108 @@
                 }
             });
         };
+
+        // --- FITUR KELOLA LAYANAN (SERVICES) ---
+        window.saveService = async () => {
+            const id = document.getElementById('srv-id').value;
+            const data = {
+                name: document.getElementById('srv-name').value,
+                category: document.getElementById('srv-cat').value,
+                price: Number(document.getElementById('srv-price').value),
+                icon: document.getElementById('srv-icon').value || '🎸'
+            };
+            if(!data.name || !data.price) return alert("Nama dan Harga wajib diisi!");
+            
+            if (id) await updateDoc(doc(db, "services", id), data);
+            else {
+                // Generate custom ID biar mirip format data awal lu
+                data.id = "srv_" + Date.now();
+                await setDoc(doc(db, "services", data.id), data);
+            }
+            
+            document.getElementById('srv-id').value = '';
+            document.getElementById('srv-name').value = '';
+            document.getElementById('srv-price').value = '';
+            document.getElementById('srv-icon').value = '';
+        };
+
+        window.editService = (id, name, cat, price, icon) => {
+            document.getElementById('srv-id').value = id;
+            document.getElementById('srv-name').value = name;
+            document.getElementById('srv-cat').value = cat;
+            document.getElementById('srv-price').value = price;
+            document.getElementById('srv-icon').value = icon;
+        };
+
+        window.deleteService = async (id) => {
+            if(confirm("Hapus layanan ini? (Pastikan tidak ada pelanggan yang sedang memesan)")) await deleteDoc(doc(db, "services", id));
+        };
+
+        onSnapshot(collection(db, "services"), (snapshot) => {
+            const list = document.getElementById('service-list');
+            list.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const d = docSnap.data();
+                list.innerHTML += `
+                    <tr class="hover:bg-zinc-800/30 transition-colors">
+                        <td class="py-3 px-2 border-b border-zinc-800/30"><span class="text-xl mr-2">${d.icon}</span> <b class="text-white">${d.name}</b> <br><span class="text-[9px] uppercase tracking-widest font-bold text-zinc-500">${d.category}</span></td>
+                        <td class="py-3 px-2 border-b border-zinc-800/30 text-emerald-400 font-black">${formatRp(d.price)}</td>
+                        <td class="py-3 px-2 border-b border-zinc-800/30 text-right">
+                            <button onclick="editService('${docSnap.id}', '${d.name}', '${d.category}', ${d.price}, '${d.icon}')" class="text-blue-500 font-bold uppercase text-[9px] mr-2">Edit</button>
+                            <button onclick="deleteService('${docSnap.id}')" class="text-rose-500 font-bold uppercase text-[9px]">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+
+        // --- FITUR KELOLA ADD-ON ALAT ---
+        window.saveAddon = async () => {
+            const id = document.getElementById('add-id').value;
+            const data = {
+                name: document.getElementById('add-name').value,
+                price: Number(document.getElementById('add-price').value)
+            };
+            if(!data.name || !data.price) return alert("Nama dan Harga wajib diisi!");
+            
+            if (id) await updateDoc(doc(db, "addons", id), data);
+            else {
+                data.id = "add_" + Date.now();
+                await setDoc(doc(db, "addons", data.id), data);
+            }
+            
+            document.getElementById('add-id').value = '';
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-price').value = '';
+        };
+
+        window.editAddon = (id, name, price) => {
+            document.getElementById('add-id').value = id;
+            document.getElementById('add-name').value = name;
+            document.getElementById('add-price').value = price;
+        };
+
+        window.deleteAddon = async (id) => {
+            if(confirm("Hapus tambahan alat ini?")) await deleteDoc(doc(db, "addons", id));
+        };
+
+        onSnapshot(collection(db, "addons"), (snapshot) => {
+            const list = document.getElementById('addon-list');
+            list.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const d = docSnap.data();
+                list.innerHTML += `
+                    <tr class="hover:bg-zinc-800/30 transition-colors">
+                        <td class="py-3 px-2 border-b border-zinc-800/30 font-bold text-white">${d.name}</td>
+                        <td class="py-3 px-2 border-b border-zinc-800/30 text-emerald-400 font-black">+ ${formatRp(d.price)}</td>
+                        <td class="py-3 px-2 border-b border-zinc-800/30 text-right">
+                            <button onclick="editAddon('${docSnap.id}', '${d.name}', ${d.price})" class="text-blue-500 font-bold uppercase text-[9px] mr-2">Edit</button>
+                            <button onclick="deleteAddon('${docSnap.id}')" class="text-rose-500 font-bold uppercase text-[9px]">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
     </script>
 </body>
 </html>
