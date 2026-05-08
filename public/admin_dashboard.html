@@ -203,93 +203,93 @@
                 </div>
             </div>
 
-            <!-- TAB 3: DATA INVENTARIS STUDIO -->
             <div id="tab-inventory" class="tab-content w-full min-w-0">
-                <div class="grid xl:grid-cols-3 gap-6 w-full min-w-0">
+                <div class="grid xl:grid-cols-3 gap-5 md:gap-6 w-full max-w-full min-w-0">
                     
-                    <!-- Kiri: Form Tambah/Edit Alat -->
-                    <div class="xl:col-span-1 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full h-fit">
+                    <div class="xl:col-span-1 bg-zinc-900/80 p-5 md:p-6 rounded-[2rem] border border-zinc-800 w-full max-w-full h-fit overflow-hidden">
                         <h3 class="text-white font-black uppercase text-sm border-b border-zinc-800 pb-3 mb-5" id="form-inv-title">Tambah Inventaris</h3>
                         <input type="hidden" id="inv-id" value="">
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
+                        <div class="space-y-4 w-full">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">No. Studio</label>
                                     <select id="inv-nostudio" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                         <option value="Studio 1">Studio 1</option><option value="Studio 2">Studio 2</option><option value="Studio 3">Studio 3</option><option value="Luar Studio">Luar Studio</option>
                                     </select>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Kategori</label>
                                     <input type="text" id="inv-kategori" placeholder="Cth: Drum / Gitar" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Nama Alat</label>
                                 <input type="text" id="inv-nama" placeholder="Contoh: Drum Snare 14" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Serial Number (SN)</label>
                                     <input type="text" id="inv-sn" placeholder="SN12345" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Status Alat</label>
                                     <select id="inv-status" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                         <option value="Tersedia">Tersedia</option><option value="Dipinjam">Dipinjam</option><option value="Rusak">Rusak</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Tgl Beli</label>
                                     <input type="date" id="inv-tglbeli" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Harga Beli</label>
                                     <input type="number" id="inv-hargabeli" placeholder="1500000" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Nama Toko</label>
                                     <input type="text" id="inv-namatoko" placeholder="Toko Nada" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">No Kontak Toko</label>
                                     <input type="text" id="inv-kontaktoko" placeholder="0812..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                                 </div>
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Catatan / Noted</label>
                                 <input type="text" id="inv-noted" placeholder="Catatan alat..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none focus:border-emerald-500">
                             </div>
-                            <div>
+                            
+                            <div class="min-w-0 overflow-hidden w-full max-w-full">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 block">Upload Foto Alat (Opsional)</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="file" id="inv-image-file" accept="image/*" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-zinc-400 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer outline-none transition-all">
-                                </div>
-                                <input type="hidden" id="inv-image-url" value=""> <!-- Penampung rahasia untuk URL gambar -->
+                                <input type="file" id="inv-image-file" accept="image/*" class="w-full max-w-full overflow-hidden text-ellipsis bg-zinc-950 border border-zinc-800 rounded-xl px-2 py-2 text-[10px] text-zinc-400 file:mr-2 md:file:mr-4 file:py-1.5 file:px-3 md:file:px-4 file:rounded-lg file:border-0 file:text-[9px] file:uppercase file:tracking-widest file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer outline-none transition-all">
+                                <input type="hidden" id="inv-image-url" value="">
                                 <p id="inv-image-preview-text" class="text-[9px] text-emerald-500 mt-1 italic hidden">Ada gambar tersimpan</p>
                             </div>
-                            <div class="flex gap-2 mt-2">
-                                <button onclick="resetInvForm()" type="button" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-widest text-[10px] px-4 py-4 rounded-xl transition-all">Batal</button>
-                                <button onclick="saveInventory()" id="btn-save-inv" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95">
+                            
+                            <div class="flex gap-2 mt-3 flex-col sm:flex-row w-full min-w-0">
+                                <button onclick="resetInvForm()" type="button" class="bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-widest text-[10px] px-4 py-4 rounded-xl transition-all w-full sm:w-auto">Batal</button>
+                                <button onclick="saveInventory()" id="btn-save-inv" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] py-4 rounded-xl transition-all shadow-lg active:scale-95 w-full">
                                     Simpan Data Alat
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Kanan: Tabel Inventaris -->
-                    <div class="xl:col-span-2 bg-zinc-900/80 p-6 rounded-[2rem] border border-zinc-800 w-full min-h-[400px] flex flex-col">
+                    <div class="xl:col-span-2 bg-zinc-900/80 p-5 md:p-6 rounded-[2rem] border border-zinc-800 w-full max-w-full min-h-[400px] flex flex-col overflow-hidden">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 border-b border-zinc-800 pb-4 gap-4 w-full">
                             <h3 class="text-white font-black uppercase text-sm">Daftar Perlengkapan Studio</h3>
-                            <button onclick="exportInventoryToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0 shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] transition-all active:scale-95">
-                                ⬇️ Download Data Alat (.CSV)
+                            <button onclick="exportInventoryToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0 shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] transition-all active:scale-95 w-full sm:w-auto justify-center">
+                                ⬇️ Download Data (.CSV)
                             </button>
                         </div>
-                        <div class="w-full overflow-x-auto custom-scroll flex-1">
+                        
+                        <p class="md:hidden text-[9px] text-amber-500 italic mb-3 animate-pulse text-center w-full bg-amber-500/10 py-2 rounded-lg border border-amber-500/20">GESER TABEL KE KANAN UNTUK MELIHAT AKSI EDIT/HAPUS ➡️</p>
+                        
+                        <div class="w-full overflow-x-auto custom-scroll flex-1 max-w-full">
                             <table class="w-full text-left border-collapse whitespace-nowrap min-w-[700px]">
                                 <thead>
                                     <tr class="bg-zinc-950 text-zinc-500 text-[9px] uppercase tracking-widest">
